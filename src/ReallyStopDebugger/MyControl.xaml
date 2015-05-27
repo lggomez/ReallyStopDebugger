@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="lggomez.ReallyStopDebugger.MyControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             Background="{DynamicResource VsBrush.Window}"
+             Foreground="{DynamicResource VsBrush.WindowText}"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300"
+             Name="MyToolWindow">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Vertical" Loaded="StackPanel_Loaded" Unloaded="StackPanel_Unloaded" Margin="10,0,10,64" Grid.RowSpan="2">
+            <TextBlock Margin="104,10" HorizontalAlignment="Center"><Run Text="ReallyStopDebugger Config"/></TextBlock>
+            <Label Content="Please enter one process name per line:"/>
+            <TextBox x:Name="ProcessesTextBox" Height="155" TextWrapping="Wrap" Text="MSBuild&#xA;WebDev.WebServer40&#xA;Microsoft.VisualStudio.Web.Host" ToolTip="One process name per line" AcceptsReturn="True"/>
+            <Label x:Name="StatusLabel" Content="Label"/>
+        </StackPanel>
+        <Button Content="_Kill processes" Click="button1_Click" Width="120" x:Name="KillProcessesButton" Margin="85,50,95,20" IsDefault="True" ToolTip="This will kill the processes specified in the above textbox" RenderTransformOrigin="0.608,1.7" Grid.Row="1"/>
+    </Grid>
+</UserControl>
