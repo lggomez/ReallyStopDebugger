@@ -6,6 +6,9 @@
     <Description xml:space="preserve">General purpose process and debug killer for Visual Studio</Description>
     <MoreInfo>https://github.com/lggomez/ReallyStopDebugger</MoreInfo>
     <License>LICENSE.txt</License>
+    <GettingStartedGuide>https://github.com/lggomez/ReallyStopDebugger/blob/master/README.md#usage</GettingStartedGuide>
+    <ReleaseNotes>RELEASE.txt</ReleaseNotes>
+    <Tags>debugging</Tags>
   </Metadata>
   <Installation InstalledByMsi="false">
     <InstallationTarget Version="[12.0]" Id="Microsoft.VisualStudio.Pro" />
