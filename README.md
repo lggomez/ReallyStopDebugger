@@ -9,7 +9,7 @@ During development one can stumble upon build errors caused by MSBuild processes
 This is a quick solution to that problem, altough it can be also considered as a general purpose process killer extension.
 
 ##Compatibility
-It is supported by VS 2013 and 2015. It can run in VS 2012 but the silent mode only.
+It is supported by VS 2012, VS 2013 and VS 2015.
 
 ##Usage
 ReallyStopDebugger has 2 modes (Tools menu):
