@@ -1,0 +1,8 @@
+v1.0.1
+	-Restored VS 2012 compatibility
+v1.0
+	-Fixed dependencies and package install targets
+	-Added release notes to package
+
+v0.9
+	-First public release
