@@ -58,8 +58,8 @@ namespace lggomez.ReallyStopDebugger
         {
             // Get the instance number 0 of this tool window. This window is single instance so this instance
             // is actually the only one.
-            // The last flag is set to true so that if the tool window does not exists it will be created.
-            MyToolWindow window = this.FindToolWindow(typeof(MyToolWindow), 0, true) as MyToolWindow;
+            // The last flag is set to true so that if the tool window does not exist it will be created.
+            MyToolWindow window = FindToolWindow(typeof(MyToolWindow), 0, true) as MyToolWindow;
             
             if ((null == window) || (null == window.Frame))
             {
@@ -117,7 +117,7 @@ namespace lggomez.ReallyStopDebugger
         /// <returns>The DTE instance, or null if no instance could be resolved</returns>
         public DTE GetDte()
         {
-            return (DTE)this.GetService(typeof(DTE));
+            return (DTE)GetService(typeof(DTE));
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace lggomez.ReallyStopDebugger
         {
             try
             {
-                this.ShowToolWindow(sender, e);
+                ShowToolWindow(sender, e);
             }
             catch (Exception ex)
             {
@@ -150,7 +150,7 @@ namespace lggomez.ReallyStopDebugger
 
                 try
                 {
-                    var dte = this.GetDte();
+                    var dte = GetDte();
                     //Stop local VS debug
                     if (dte != null)
                     {
@@ -184,7 +184,7 @@ namespace lggomez.ReallyStopDebugger
                 string returnMessage;
 
                 // Find the output window.
-                Window window = this.GetDte().Windows.Item(Constants.vsWindowKindOutput);
+                Window window = GetDte().Windows.Item(Constants.vsWindowKindOutput);
                 OutputWindow outputWindow = (OutputWindow)window.Object;
 
                 OutputWindowPane owp;

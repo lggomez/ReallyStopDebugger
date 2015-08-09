@@ -18,7 +18,7 @@ namespace lggomez.ReallyStopDebugger
         public MyControl()
         {
             InitializeComponent();
-            this.StatusLabel.Visibility = System.Windows.Visibility.Hidden;
+            StatusLabel.Visibility = System.Windows.Visibility.Hidden;
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
@@ -27,7 +27,7 @@ namespace lggomez.ReallyStopDebugger
 
             try
             {
-                var dte = ((ReallyStopDebuggerPackage)this.currentPackage).GetDte();
+                var dte = ((ReallyStopDebuggerPackage)currentPackage).GetDte();
                 //Stop local VS debug
                 if (dte != null)
                 {
@@ -40,13 +40,13 @@ namespace lggomez.ReallyStopDebugger
 
             #endregion
 
-            string[] processNames = this.ProcessesTextBox.Text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+            string[] processNames = ProcessesTextBox.Text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
 
-            var result = Common.ProcessHelper.KillProcesses(this.currentPackage, processNames);
+            var result = Common.ProcessHelper.KillProcesses(currentPackage, processNames);
 
             #region UI update
 
-            this.StatusLabel.Visibility = System.Windows.Visibility.Visible;
+            StatusLabel.Visibility = System.Windows.Visibility.Visible;
 
             string returnMessage;
 
@@ -55,24 +55,24 @@ namespace lggomez.ReallyStopDebugger
                 case 0:
                     {
                         returnMessage = "Processes killed.";
-                        this.StatusLabel.Foreground = System.Windows.Media.Brushes.Green;
+                        StatusLabel.Foreground = System.Windows.Media.Brushes.Green;
                         break;
                     }
                 case 1:
                     {
                         returnMessage = "Could not find any matching processes.";
-                        this.StatusLabel.Foreground = System.Windows.Media.Brushes.Black;
+                        StatusLabel.Foreground = System.Windows.Media.Brushes.Black;
                         break;
                     }
                 default:
                     {
                         returnMessage = "Could not close orphaned processes due to an error.";
-                        this.StatusLabel.Foreground = System.Windows.Media.Brushes.Red;
+                        StatusLabel.Foreground = System.Windows.Media.Brushes.Red;
                         break;
                     }
             }
 
-            this.StatusLabel.Content = returnMessage;
+            StatusLabel.Content = returnMessage;
 
             #endregion
         }
@@ -81,12 +81,12 @@ namespace lggomez.ReallyStopDebugger
         {
             #region Load settings
 
-            SettingsStore configurationSettingsStore = this.settingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
+            SettingsStore configurationSettingsStore = settingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
             bool collectionExists = configurationSettingsStore.CollectionExists("ReallyStopDebugger");
 
             if (collectionExists)
             {
-                this.ProcessesTextBox.Text = configurationSettingsStore.GetString("ReallyStopDebugger", "ProcessList") ?? string.Empty;
+                ProcessesTextBox.Text = configurationSettingsStore.GetString("ReallyStopDebugger", "ProcessList") ?? string.Empty;
             }
 
             #endregion
@@ -96,7 +96,7 @@ namespace lggomez.ReallyStopDebugger
         {
             #region Save settings
 
-            WritableSettingsStore userSettingsStore = this.settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
+            WritableSettingsStore userSettingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
             bool collectionExists = userSettingsStore.CollectionExists("ReallyStopDebugger");
 
             if (!collectionExists)
@@ -104,7 +104,7 @@ namespace lggomez.ReallyStopDebugger
                 userSettingsStore.CreateCollection("ReallyStopDebugger");
             }
 
-            userSettingsStore.SetString("ReallyStopDebugger", "ProcessList", this.ProcessesTextBox.Text);
+            userSettingsStore.SetString("ReallyStopDebugger", "ProcessList", ProcessesTextBox.Text);
 
             #endregion
         }
