@@ -153,6 +153,7 @@
   <ItemGroup>
     <Compile Include="Common\PackageExtensions.cs" />
     <Compile Include="Common\ProcessHelper.cs" />
+    <Compile Include="Common\WindowsInterop.cs" />
     <Compile Include="MyControl.xaml.cs">
       <DependentUpon>MyControl.xaml</DependentUpon>
     </Compile>
