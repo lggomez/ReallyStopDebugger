@@ -2,22 +2,29 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using Process = System.Diagnostics.Process;
-using System.Management;
 
 namespace lggomez.ReallyStopDebugger.Common
 {
     internal static class ProcessHelper
     {
-        public static int KillProcesses(Package package, string[] processNames, bool consoleMode = false)
+        public static int KillProcesses(Package package, string[] processNames, bool restrictUser, bool consoleMode = false)
         {
             string currentProcessName = string.Empty;
 
             try
             {
-                var runningProcesses = Process.GetProcesses();
+                var runningProcesses = new List<Process>();
+
+                if (restrictUser)
+                {
+                    runningProcesses = WindowsInterop.GetCurrentUserProcesses();
+                }
+                else
+                {
+                    runningProcesses = Process.GetProcesses().ToList();
+                }
 
                 List<Process> filteredProcesses = runningProcesses.Join(processNames,
                     p => (p.ProcessName ?? string.Empty).ToLower(),
@@ -26,7 +33,7 @@ namespace lggomez.ReallyStopDebugger.Common
                     .ToList();
 
                 if (!filteredProcesses.Any())
-                    return 1;
+                    return Constants.PROCESSESNOTFOUND;
 
                 foreach (var p in filteredProcesses)
                 {
@@ -40,7 +47,7 @@ namespace lggomez.ReallyStopDebugger.Common
                 {
                     package.ShowErrorMessage(string.Format("The associated process could not be terminated, is terminating or is an invalid Win32 process."), "Error killing process: " + currentProcessName);
                 }
-                return -1;
+                return Constants.PROCESSESKILLERROR;
             }
             catch (NotSupportedException)
             {
@@ -48,7 +55,7 @@ namespace lggomez.ReallyStopDebugger.Common
                 {
                     package.ShowErrorMessage(string.Format("Cannot kill a process running on a remote computer. Aborting."), "Error killing process: " + currentProcessName);
                 }
-                return -1;
+                return Constants.PROCESSESKILLERROR;
             }
             catch (InvalidOperationException)
             {
@@ -56,7 +63,7 @@ namespace lggomez.ReallyStopDebugger.Common
                 {
                     package.ShowErrorMessage(string.Format("The process has already exited or was not found."), "Error killing process: " + currentProcessName);
                 }
-                return -1;
+                return Constants.PROCESSESKILLERROR;
             }
             catch (Exception ex)
             {
@@ -64,10 +71,10 @@ namespace lggomez.ReallyStopDebugger.Common
                 {
                     package.ShowErrorMessage(string.Format("An exception has occurred: " + ex.Message), "Error killing process: " + currentProcessName);
                 }
-                return -1;
+                return Constants.PROCESSESKILLERROR;
             }
 
-            return 0;
+            return Constants.PROCESSESKILLSUCCESS;
         }
     }
 }

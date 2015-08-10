@@ -58,9 +58,9 @@ namespace lggomez.ReallyStopDebugger
         {
             // Get the instance number 0 of this tool window. This window is single instance so this instance
             // is actually the only one.
-            // The last flag is set to true so that if the tool window does not exists it will be created.
-            MyToolWindow window = this.FindToolWindow(typeof(MyToolWindow), 0, true) as MyToolWindow;
-            
+            // The last flag is set to true so that if the tool window does not exist it will be created.
+            MyToolWindow window = FindToolWindow(typeof(MyToolWindow), 0, true) as MyToolWindow;
+
             if ((null == window) || (null == window.Frame))
             {
                 throw new NotSupportedException(Resources.CanNotCreateWindow);
@@ -93,7 +93,7 @@ namespace lggomez.ReallyStopDebugger
             // Add our command handlers for menu (commands must exist in the .vsct file)
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
 
-            if ( null != mcs )
+            if (null != mcs)
             {
                 // Create the command for the cfg menu item.
                 CommandID menuCommandID = new CommandID(GuidList.guidReallyStopDebuggerCmdSet, (int)PkgCmdIDList.cmdidReallyStopDebugger);
@@ -106,7 +106,7 @@ namespace lggomez.ReallyStopDebugger
                 // Create the command for the tool window
                 CommandID toolwndCommandID = new CommandID(GuidList.guidReallyStopDebuggerCmdSet, (int)PkgCmdIDList.cmdidReallyStopDebuggerCfg);
                 MenuCommand menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
-                mcs.AddCommand( menuToolWin );
+                mcs.AddCommand(menuToolWin);
             }
         }
         #endregion
@@ -117,7 +117,7 @@ namespace lggomez.ReallyStopDebugger
         /// <returns>The DTE instance, or null if no instance could be resolved</returns>
         public DTE GetDte()
         {
-            return (DTE)this.GetService(typeof(DTE));
+            return (DTE)GetService(typeof(DTE));
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace lggomez.ReallyStopDebugger
         {
             try
             {
-                this.ShowToolWindow(sender, e);
+                ShowToolWindow(sender, e);
             }
             catch (Exception ex)
             {
@@ -147,10 +147,11 @@ namespace lggomez.ReallyStopDebugger
             try
             {
                 #region Stop debug mode
+                var dte = GetDte();
+                int result = -1;
 
                 try
                 {
-                    var dte = this.GetDte();
                     //Stop local VS debug
                     if (dte != null)
                     {
@@ -172,19 +173,44 @@ namespace lggomez.ReallyStopDebugger
 
                 if (collectionExists)
                 {
-                    filter = (configurationSettingsStore.GetString("ReallyStopDebugger", "ProcessList") ?? string.Empty).Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ProcessList"))
+                    {
+                        filter = (configurationSettingsStore.GetString("ReallyStopDebugger", "ProcessList") ?? string.Empty).Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+                    }
+
+                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "UserProcess"))
+                    {
+                        var filterByLocalUser = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "UserProcess"));
+
+                        result = ProcessHelper.KillProcesses(this, filter.ToArray(), filterByLocalUser, true);
+                    }
+                }
+                else
+                {
+                    result = ProcessHelper.KillProcesses(this, filter.ToArray(), false, true);
                 }
 
-                var result = ProcessHelper.KillProcesses(this, filter.ToArray(), true);
-
                 #endregion
+
+                if (collectionExists)
+                {
+                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "UserProcess"))
+                    {
+                        var forceClean = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "ForceClean"));
+
+                        if (forceClean && !string.IsNullOrWhiteSpace(dte.Solution.FullName))
+                        {
+                            Common.FileUtils.AttemptHardClean(dte);
+                        }
+                    }
+                }
 
                 #region Output window handling
 
                 string returnMessage;
 
                 // Find the output window.
-                Window window = this.GetDte().Windows.Item(Constants.vsWindowKindOutput);
+                Window window = GetDte().Windows.Item(Constants.vsWindowKindOutput);
                 OutputWindow outputWindow = (OutputWindow)window.Object;
 
                 OutputWindowPane owp;
@@ -192,21 +218,21 @@ namespace lggomez.ReallyStopDebugger
 
                 switch (result)
                 {
-                    case 0:
-                    {
-                        returnMessage = "ReallyStopDebugger>------ Processes killed.";
-                        break;
-                    }
-                    case 1:
-                    {
-                        returnMessage = "ReallyStopDebugger>------ Could not find any matching processes.";
-                        break;
-                    }
+                    case Common.Constants.PROCESSESKILLSUCCESS:
+                        {
+                            returnMessage = "ReallyStopDebugger>------ Processes killed.";
+                            break;
+                        }
+                    case Common.Constants.PROCESSESNOTFOUND:
+                        {
+                            returnMessage = "ReallyStopDebugger>------ Could not find any matching processes.";
+                            break;
+                        }
                     default:
-                    {
-                        returnMessage = "ReallyStopDebugger>------ Could not close orphaned processes due to an error.";
-                        break;
-                    }
+                        {
+                            returnMessage = "ReallyStopDebugger>------ Could not close orphaned processes due to an error.";
+                            break;
+                        }
                 }
 
                 owp.Activate();
