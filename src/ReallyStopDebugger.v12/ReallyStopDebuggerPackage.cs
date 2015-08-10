@@ -29,11 +29,19 @@ namespace lggomez.ReallyStopDebugger
     [PackageRegistration(UseManagedResourcesOnly = true)]
     // This attribute is used to register the information needed to show this package
     // in the Help/About dialog of Visual Studio.
-    [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", "1.1.1", IconResourceID = 400)]
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
     // This attribute registers a tool window exposed by this package.
     [ProvideToolWindow(typeof(MyToolWindow))]
+    [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
+    [ProvideAutoLoad(UIContextGuids80.SolutionExistsAndNotBuildingAndNotDebugging)]
+    [ProvideAutoLoad(UIContextGuids80.NoSolution)]
+    [ProvideAutoLoad(UIContextGuids80.SolutionBuilding)]
+    [ProvideAutoLoad(UIContextGuids80.Debugging)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.NotBuildingAndNotDebugging_string)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.CodeWindow_string)]
     [Guid(GuidList.guidReallyStopDebuggerPkgString)]
     public sealed class ReallyStopDebuggerPackage : Package
     {
@@ -46,6 +54,7 @@ namespace lggomez.ReallyStopDebugger
         /// </summary>
         public ReallyStopDebuggerPackage()
         {
+            Console.Write(false);
         }
 
         /// <summary>

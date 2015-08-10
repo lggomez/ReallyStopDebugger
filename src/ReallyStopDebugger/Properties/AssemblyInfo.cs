@@ -1,15 +1,16 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Resources;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("lggomez.ReallyStopDebugger.Properties")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("ReallyStopDebugger")]
+[assembly: AssemblyDescription("General purpose process and debug killer for Visual Studio")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("______")]
-[assembly: AssemblyProduct("lggomez.ReallyStopDebugger.Properties")]
-[assembly: AssemblyCopyright("Copyright © ______ 2015")]
+[assembly: AssemblyCompany("lggomez")]
+[assembly: AssemblyProduct("ReallyStopDebugger")]
+[assembly: AssemblyCopyright("Copyright © lggomez 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -28,5 +29,6 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.2.0.0")]
+[assembly: AssemblyVersion("1.1.1.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: NeutralResourcesLanguageAttribute("en")]
