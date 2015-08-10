@@ -22,7 +22,7 @@ ReallyStopDebugger has 2 modes (Tools menu):
 * Processes will be handled with the same privilege as the VS's owner
 
 ##Dependencies
-To compile and run the solution Visual Studio 2013 is required, plus the VS 2013 SDK and a strong name key file (Key.snk) to compile and sign the assembly (you can disable this option in the project properties, Signing tab).
+To compile and run the solution Visual Studio 2015 Community (or higher) Edition is required, plus the VS 2015 SDK and a strong name key file (Key.snk) to compile and sign the assembly (you can disable this option in the project properties, Signing tab).
 
 ##TODOs
 - Improve UI
