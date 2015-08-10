@@ -32,7 +32,7 @@
                Grid.Row="1"/>
 
         <TextBox Grid.Row="2" Grid.Column="0" x:Name="processesTextBox" TextWrapping="Wrap" Text="MSBuild&#xA;WebDev.WebServer40&#xA;Microsoft.VisualStudio.Web.Host" ToolTip="One process name per line" AcceptsReturn="True" Margin="0,0,10,29"/>
-        <Label Grid.Row="2" Grid.Column="0" x:Name="StatusLabel" Content="StatusLabel" Margin="0,156,10,0"/>
+        <Label Grid.Row="2" Grid.Column="0" x:Name="StatusLabel" Content="StatusLabel" Margin="0,156,10,0" Height="24" VerticalAlignment="Bottom"/>
 
         <Button Grid.Row="3" Content="_Kill processes" Click="killProcessesButton_Click" x:Name="killProcessesButton" Margin="168,10,0,10" IsDefault="True" ToolTip="This will kill the processes specified in the above textbox" RenderTransformOrigin="0.608,1.7" HorizontalAlignment="Left" Width="152"/>
         <CheckBox x:Name="userProcessCheckBox" 
