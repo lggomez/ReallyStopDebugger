@@ -18,16 +18,18 @@ namespace lggomez.ReallyStopDebugger
         public MyControl()
         {
             InitializeComponent();
-            StatusLabel.Visibility = System.Windows.Visibility.Hidden;
+            StatusLabel.Visibility = Visibility.Hidden;
+            Loaded += ReallyStopDebuggerConfig_Loaded;
+            Unloaded += ReallyStopDebuggerConfig_Unloaded;
         }
 
-        private void button1_Click(object sender, RoutedEventArgs e)
+        private void killProcessesButton_Click(object sender, RoutedEventArgs e)
         {
             #region Stop debug mode
+            var dte = ((ReallyStopDebuggerPackage)currentPackage).GetDte();
 
             try
             {
-                var dte = ((ReallyStopDebuggerPackage)currentPackage).GetDte();
                 //Stop local VS debug
                 if (dte != null)
                 {
@@ -40,28 +42,32 @@ namespace lggomez.ReallyStopDebugger
 
             #endregion
 
-            string[] processNames = ProcessesTextBox.Text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+            string[] processNames = processesTextBox.Text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+            var result = Common.ProcessHelper.KillProcesses(currentPackage, processNames, userProcessCheckBox.IsChecked.GetValueOrDefault());
 
-            var result = Common.ProcessHelper.KillProcesses(currentPackage, processNames);
-
+            if (forceCleanCheckBox.IsChecked.GetValueOrDefault() && !string.IsNullOrWhiteSpace(dte.Solution.FullName))
+            {
+                Common.FileUtils.AttemptHardClean(dte);
+            }
+                
             #region UI update
 
-            StatusLabel.Visibility = System.Windows.Visibility.Visible;
+            StatusLabel.Visibility = Visibility.Visible;
 
             string returnMessage;
 
             switch (result)
             {
-                case 0:
+                case Common.Constants.PROCESSESKILLSUCCESS:
                     {
                         returnMessage = "Processes killed.";
                         StatusLabel.Foreground = System.Windows.Media.Brushes.Green;
                         break;
                     }
-                case 1:
+                case Common.Constants.PROCESSESNOTFOUND:
                     {
                         returnMessage = "Could not find any matching processes.";
-                        StatusLabel.Foreground = System.Windows.Media.Brushes.Black;
+                        StatusLabel.Foreground = System.Windows.Media.Brushes.Orange;
                         break;
                     }
                 default:
@@ -77,7 +83,7 @@ namespace lggomez.ReallyStopDebugger
             #endregion
         }
 
-        private void StackPanel_Loaded(object sender, RoutedEventArgs e)
+        private void ReallyStopDebuggerConfig_Loaded(object sender, RoutedEventArgs e)
         {
             #region Load settings
 
@@ -86,13 +92,26 @@ namespace lggomez.ReallyStopDebugger
 
             if (collectionExists)
             {
-                ProcessesTextBox.Text = configurationSettingsStore.GetString("ReallyStopDebugger", "ProcessList") ?? string.Empty;
+                if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ProcessList"))
+                {
+                    processesTextBox.Text = configurationSettingsStore.GetString("ReallyStopDebugger", "ProcessList") ?? string.Empty;
+                }
+
+                if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ForceClean"))
+                {
+                    forceCleanCheckBox.IsChecked = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "ForceClean"));
+                }
+
+                if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "UserProcess"))
+                {
+                    userProcessCheckBox.IsChecked = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "UserProcess"));
+                }
             }
 
             #endregion
         }
 
-        private void StackPanel_Unloaded(object sender, RoutedEventArgs e)
+        private void ReallyStopDebuggerConfig_Unloaded(object sender, RoutedEventArgs e)
         {
             #region Save settings
 
@@ -104,7 +123,9 @@ namespace lggomez.ReallyStopDebugger
                 userSettingsStore.CreateCollection("ReallyStopDebugger");
             }
 
-            userSettingsStore.SetString("ReallyStopDebugger", "ProcessList", ProcessesTextBox.Text);
+            userSettingsStore.SetString("ReallyStopDebugger", "ProcessList", processesTextBox.Text);
+            userSettingsStore.SetString("ReallyStopDebugger", "ForceClean", forceCleanCheckBox.IsChecked.GetValueOrDefault().ToString());
+            userSettingsStore.SetString("ReallyStopDebugger", "UserProcess", userProcessCheckBox.IsChecked.GetValueOrDefault().ToString());
 
             #endregion
         }
