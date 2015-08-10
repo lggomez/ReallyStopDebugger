@@ -1,0 +1,18 @@
+v1.1
+	-New: Now you can kill processes belonging to current user only
+	-New: Force clean option added. This will try to forcefully delete /bin and /obj
+		directories on the current solution after debug is stopped
+	-Fix: Label colors on VS instances using the dark theme
+	-Fix: Control layout in the Config tool window. Now it should scale
+		better upon window resize
+	-Fix: Minor code fixes and cleanup
+
+v1.0.1
+	-Restored VS 2012 compatibility
+
+v1.0
+	-Fixed dependencies and package install targets
+	-Added release notes to package
+
+v0.9
+	-First public release
