@@ -37,7 +37,8 @@
     <RootNamespace>lggomez.ReallyStopDebugger</RootNamespace>
     <AssemblyName>ReallyStopDebugger</AssemblyName>
     <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -201,13 +202,15 @@
     <Content Include="..\ReallyStopDebugger\ReallyStopDebugger.vsct">
       <Link>ReallyStopDebugger.vsct</Link>
     </Content>
-    <None Include="Key.snk" />
     <Resource Include="..\ReallyStopDebugger\Resources\Images.png">
       <Link>Resources\Images.png</Link>
     </Resource>
     <Resource Include="..\ReallyStopDebugger\Resources\Package.ico">
       <Link>Resources\Package.ico</Link>
     </Resource>
+    <None Include="..\ReallyStopDebugger\Key.snk">
+      <Link>Key.snk</Link>
+    </None>
     <None Include="..\ReallyStopDebugger\source.extension.vsixmanifest">
       <Link>source.extension.vsixmanifest</Link>
     </None>
@@ -238,14 +241,14 @@
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-	  <MergeWithCTO>true</MergeWithCTO>
+      <MergeWithCTO>true</MergeWithCTO>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-  <VSCTCompile Include="..\ReallyStopDebugger\ReallyStopDebugger.vsct">
-    <ResourceName>Menus.ctmenu</ResourceName>
-  </VSCTCompile>
-</ItemGroup>
+    <VSCTCompile Include="..\ReallyStopDebugger\ReallyStopDebugger.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+  </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
   </PropertyGroup>
