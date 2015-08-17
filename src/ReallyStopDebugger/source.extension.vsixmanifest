@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="ac0339e4-4a14-4eaf-9dd6-3d69d61b4c30" Version="1.1.1" Language="en-US" Publisher="lggomez" />
+    <Identity Id="ac0339e4-4a14-4eaf-9dd6-3d69d61b4c30" Version="1.1.2" Language="en-US" Publisher="lggomez" />
     <DisplayName>ReallyStopDebugger</DisplayName>
     <Description xml:space="preserve">General purpose process and debug killer for Visual Studio</Description>
     <MoreInfo>https://github.com/lggomez/ReallyStopDebugger</MoreInfo>

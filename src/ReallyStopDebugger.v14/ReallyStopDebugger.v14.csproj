@@ -179,8 +179,8 @@
     <Compile Include="..\ReallyStopDebugger\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="MyControl.xaml.cs">
-      <DependentUpon>MyControl.xaml</DependentUpon>
+    <Compile Include="..\ReallyStopDebugger\ReallyStopDebuggerConfigControl.xaml.cs">
+      <Link>ReallyStopDebuggerConfigControl.xaml.cs</Link>
     </Compile>
     <Compile Include="MyToolWindow.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -225,16 +225,6 @@
     <None Include="..\ReallyStopDebugger\source.extension.vsixmanifest">
       <Link>source.extension.vsixmanifest</Link>
     </None>
-    <Content Include="LICENSE.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="MyControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
@@ -247,6 +237,20 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="..\ReallyStopDebugger\ReallyStopDebuggerConfigControl.xaml">
+      <Link>ReallyStopDebuggerConfigControl.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\ReallyStopDebugger\LICENSE.txt">
+      <Link>LICENSE.txt</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>

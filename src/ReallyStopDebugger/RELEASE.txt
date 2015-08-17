@@ -1,3 +1,17 @@
+v1.1.2
+	-Change: Config button caption to something less dramatic
+	-Fix: Control layout in the Config tool window. Now it should scale
+		better upon window resize (really!). Also fixed layout margins
+	-Fix: Minor code fixes and cleanup
+	-New: The code has been refactored into a core code base with 2 solutions
+		linked to it, one for Visual Studio 2013 (Update 5) and another for 
+		VS 2015
+		Development will be done in VS 2015, and the VS 2013 solution will be
+		used for compatibility testing purposes
+
+v1.1.1
+	-Fix: Control layout in the Config tool window.
+		
 v1.1
 	-New: Now you can kill processes belonging to current user only
 	-New: Force clean option added. This will try to forcefully delete /bin and /obj

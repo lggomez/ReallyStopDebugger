@@ -179,8 +179,8 @@
     <Compile Include="..\ReallyStopDebugger\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="MyControl.xaml.cs">
-      <DependentUpon>MyControl.xaml</DependentUpon>
+    <Compile Include="..\ReallyStopDebugger\ReallyStopDebuggerConfigControl.xaml.cs">
+      <Link>ReallyStopDebuggerConfigControl.xaml.cs</Link>
     </Compile>
     <Compile Include="MyToolWindow.cs" />
     <Compile Include="ReallyStopDebuggerPackage.cs" />
@@ -194,6 +194,7 @@
     <Content Include="..\ReallyStopDebugger\LICENSE.txt">
       <Link>LICENSE.txt</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\ReallyStopDebugger\RELEASE.txt">
       <Link>RELEASE.txt</Link>
@@ -214,12 +215,6 @@
     <None Include="..\ReallyStopDebugger\source.extension.vsixmanifest">
       <Link>source.extension.vsixmanifest</Link>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="MyControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
@@ -248,6 +243,13 @@
     <VSCTCompile Include="..\ReallyStopDebugger\ReallyStopDebugger.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="..\ReallyStopDebugger\ReallyStopDebuggerConfigControl.xaml">
+      <Link>ReallyStopDebuggerConfigControl.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
