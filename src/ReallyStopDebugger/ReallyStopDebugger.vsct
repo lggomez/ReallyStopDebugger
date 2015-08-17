@@ -101,10 +101,10 @@
   
   <Symbols>
     <!-- This is the package guid. -->
-    <GuidSymbol name="guidReallyStopDebuggerPkg" value="{6880C4A5-DB6B-4C60-AA84-9EB8973906EA}" />
+    <GuidSymbol name="guidReallyStopDebuggerPkg" value="{F4802ACB-BF36-4A39-98C5-C7C24CDB82FA}" />
 
     <!-- This is the guid used to group the menu commands together -->
-    <GuidSymbol name="guidReallyStopDebuggerCmdSet" value="{D438C789-246B-4EFF-850A-DEA4407DA61B}">
+    <GuidSymbol name="guidReallyStopDebuggerCmdSet" value="{D2C106BC-114A-48B7-947E-25D32F287F06}">
 
       <IDSymbol name="MyMenuGroup" value="0x1020" />
       <IDSymbol name="cmdidReallyStopDebugger" value="0x0100" />

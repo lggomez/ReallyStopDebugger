@@ -196,3 +196,9 @@ FakesAssemblies/
 *.opt
 
 src/ReallyStopDebugger/Key.snk
+*.snk
+
+# Preserver user project properties to start Visual Studio  
+# experimental instance
+!src/ReallyStopDebugger.v12/ReallyStopDebugger.v12.csproj.user
+!src/ReallyStopDebugger.v14/ReallyStopDebugger.v14.csproj.user
