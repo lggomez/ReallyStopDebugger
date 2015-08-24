@@ -1,3 +1,9 @@
+v1.2
+	-Fix: Improved exception handling on initialization
+	-Fix: Minor code fixes and cleanup
+	-New: Button to add the current VS instance children processes to the
+		name list
+
 v1.1.2
 	-Change: Config button caption to something less dramatic
 	-Fix: Control layout in the Config tool window. Now it should scale
