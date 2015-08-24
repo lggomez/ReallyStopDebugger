@@ -35,8 +35,8 @@
                Grid.Row="1"
                Grid.ColumnSpan="2"/>
 
-        <TextBox Grid.Row="2" Grid.Column="0" x:Name="processesTextBox" TextWrapping="Wrap" Text="MSBuild&#xA;WebDev.WebServer40&#xA;Microsoft.VisualStudio.Web.Host" ToolTip="One process name per line" AcceptsReturn="True" Margin="0,0,10,29"/>
-        <Label Grid.Row="2" Grid.Column="0" x:Name="StatusLabel" Content="StatusLabel" Margin="0,156,10,0" Height="24" VerticalAlignment="Bottom"/>
+        <TextBox Grid.Row="2" Grid.Column="0" x:Name="processesTextBox" TextWrapping="Wrap" Text="MSBuild&#xA;WebDev.WebServer40&#xA;Microsoft.VisualStudio.Web.Host" ToolTip="One process name per line" AcceptsReturn="True" Margin="0,0,10,46"/>
+        <Label Grid.Row="2" Grid.Column="0" x:Name="StatusLabel" Content="StatusLabel&#xD;&#xA;StatusLabel" Margin="0,0,10,0" Height="41" VerticalAlignment="Bottom"/>
         <CheckBox x:Name="userProcessCheckBox" 
                   Foreground="{DynamicResource ResourceKey={x:Static vsui:EnvironmentColors.SystemMenuTextBrushKey}}"
                   Content="Restrict to this user&#xD;&#xA;&#xD;&#xA;" Grid.Column="1" HorizontalAlignment="Left" Margin="0,10,0,0" Grid.Row="2" VerticalAlignment="Top" Width="140" Height="20" IsChecked="True" ToolTip="Restrict process matching to this user only"/>
@@ -47,6 +47,11 @@
         	ToolTip="This will kill the processes specified in the above textbox"
         	HorizontalAlignment="Center"
         	HorizontalContentAlignment="Center"
-        	Width="150" Margin="157,10,25,10"/>
+        	Width="150" Margin="250,10,80,10" Padding="2,2,2,2" Grid.ColumnSpan="2"/>
+        <Button Grid.Row="3" Content="_Load childen" Click="loadChildProcessesButton_Click" x:Name="loadChildProcessesButton" IsDefault="True" 
+        	ToolTip="Load running processes asociated with the current Visual Studio instance"
+        	HorizontalAlignment="Center"
+        	HorizontalContentAlignment="Center"
+        	Width="150" Margin="81,10,101,10" Padding="2,2,2,2"/>
     </Grid>
 </UserControl>

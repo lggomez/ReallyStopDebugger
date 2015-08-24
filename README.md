@@ -15,6 +15,7 @@ NOTE: If you are updating from version 0.9, you might need to reinstall the exte
 ##Usage
 ReallyStopDebugger has 2 modes (Tools menu):
 * Normal mode: In this mode you can set up which processes you want to kill (windowed), along with additional options:
+ * Load childen - Loads all the childen processes of the current Visual Studio instance
  * Restrict to this user - Filters processes to the current user's only. Useful for shared development environments, such as VMs
  * Attempt to force clean solution - Will try to manually erase /bin and /obj directories in the solution. Requires VS to be run as Administrator to work properly
 * Silent mode: This mode just runs the extension as set up in the configuration window, and redirects status messages to the Output window (if available)
