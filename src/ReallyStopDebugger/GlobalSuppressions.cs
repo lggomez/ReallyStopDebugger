@@ -1,4 +1,7 @@
-﻿// This file is used by Code Analysis to maintain SuppressMessage
+﻿// Copyright (c) Luis Gómez. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the src\ReallyStopDebugger directory for full license information.
+
+// This file is used by Code Analysis to maintain SuppressMessage
 // attributes that are applied to this project. Project-level
 // suppressions either have no target or are given a specific target
 // and scoped to a namespace, type, member, etc.

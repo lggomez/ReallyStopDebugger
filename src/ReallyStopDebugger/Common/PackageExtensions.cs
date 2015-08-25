@@ -1,4 +1,7 @@
-﻿using Microsoft.VisualStudio;
+﻿// Copyright (c) Luis Gómez. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the src\ReallyStopDebugger directory for full license information.
+
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 

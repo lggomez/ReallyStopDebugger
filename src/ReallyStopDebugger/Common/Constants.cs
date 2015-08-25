@@ -1,4 +1,7 @@
-﻿namespace lggomez.ReallyStopDebugger.Common
+﻿// Copyright (c) Luis Gómez. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the src\ReallyStopDebugger directory for full license information.
+
+namespace lggomez.ReallyStopDebugger.Common
 {
     public static class Constants
     {

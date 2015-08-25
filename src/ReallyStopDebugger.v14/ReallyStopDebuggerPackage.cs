@@ -1,4 +1,7 @@
-﻿using EnvDTE;
+﻿// Copyright (c) Luis Gómez. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the src\ReallyStopDebugger directory for full license information.
+
+using EnvDTE;
 using lggomez.ReallyStopDebugger.Common;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Settings;

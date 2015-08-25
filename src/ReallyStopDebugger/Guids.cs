@@ -1,4 +1,7 @@
-﻿// Guids.cs
+﻿// Copyright (c) Luis Gómez. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the src\ReallyStopDebugger directory for full license information.
+
+// Guids.cs
 // MUST match guids.h
 using System;
 
