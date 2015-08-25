@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace lggomez.ReallyStopDebugger.Common
+namespace ReallyStopDebugger.Common
 {
     public static class FileUtils
     {

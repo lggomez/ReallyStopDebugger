@@ -1,11 +1,14 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿// Copyright (c) Luis Gómez. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the src\ReallyStopDebugger directory for full license information.
+
+using Microsoft.VisualStudio.Shell;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Process = System.Diagnostics.Process;
 
-namespace lggomez.ReallyStopDebugger.Common
+namespace ReallyStopDebugger.Common
 {
     internal static class ProcessHelper
     {

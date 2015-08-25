@@ -1,8 +1,11 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿// Copyright (c) Luis Gómez. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the src\ReallyStopDebugger directory for full license information.
+
+using Microsoft.VisualStudio.Shell;
 using System;
 using System.Runtime.InteropServices;
 
-namespace lggomez.ReallyStopDebugger
+namespace ReallyStopDebugger
 {
     /// <summary>
     /// This class implements the tool window exposed by this package and hosts a user control.

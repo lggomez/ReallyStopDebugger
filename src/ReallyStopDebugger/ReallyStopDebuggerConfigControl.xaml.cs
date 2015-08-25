@@ -1,14 +1,17 @@
-﻿using System;
+﻿// Copyright (c) Luis Gómez. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the src\ReallyStopDebugger directory for full license information.
+
+using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using lggomez.ReallyStopDebugger.Common;
+using ReallyStopDebugger.Common;
 using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
 
-namespace lggomez.ReallyStopDebugger
+namespace ReallyStopDebugger
 {
     /// <summary>
     /// Interaction logic for MyControl.xaml
