@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the src\ReallyStopDebugger directory for full license information.
 
 using EnvDTE;
-using lggomez.ReallyStopDebugger.Common;
+using ReallyStopDebugger.Common;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
@@ -14,7 +14,7 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace lggomez.ReallyStopDebugger
+namespace ReallyStopDebugger
 {
     using Constants = EnvDTE.Constants;
 

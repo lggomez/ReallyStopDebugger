@@ -5,7 +5,7 @@
 // MUST match guids.h
 using System;
 
-namespace lggomez.ReallyStopDebugger
+namespace ReallyStopDebugger
 {
     static class GuidList
     {

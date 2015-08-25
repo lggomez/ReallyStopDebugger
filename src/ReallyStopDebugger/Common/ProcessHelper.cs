@@ -8,7 +8,7 @@ using System.ComponentModel;
 using System.Linq;
 using Process = System.Diagnostics.Process;
 
-namespace lggomez.ReallyStopDebugger.Common
+namespace ReallyStopDebugger.Common
 {
     internal static class ProcessHelper
     {

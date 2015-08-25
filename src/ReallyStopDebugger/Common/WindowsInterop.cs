@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Principal;
 
-namespace lggomez.ReallyStopDebugger.Common
+namespace ReallyStopDebugger.Common
 {
     public static class WindowsInterop
     {

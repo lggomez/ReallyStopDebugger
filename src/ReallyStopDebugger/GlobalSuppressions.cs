@@ -12,7 +12,7 @@
 // file manually.
 
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1017:MarkAssembliesWithComVisible")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2111:PointersShouldNotBeVisible", Scope = "member", Target = "lggomez.ReallyStopDebugger.Common.NativeMethods+SID_AND_ATTRIBUTES.#Sid")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2111:PointersShouldNotBeVisible", Scope = "member", Target = "lggomez.ReallyStopDebugger.Common.WindowsInterop+SID_AND_ATTRIBUTES.#Sid")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass", Scope = "member", Target = "lggomez.ReallyStopDebugger.Common.WindowsInterop.#OpenProcessToken(System.IntPtr,System.UInt32,System.IntPtr&)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2111:PointersShouldNotBeVisible", Scope = "member", Target = "ReallyStopDebugger.Common.NativeMethods+SID_AND_ATTRIBUTES.#Sid")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2111:PointersShouldNotBeVisible", Scope = "member", Target = "ReallyStopDebugger.Common.WindowsInterop+SID_AND_ATTRIBUTES.#Sid")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass", Scope = "member", Target = "ReallyStopDebugger.Common.WindowsInterop.#OpenProcessToken(System.IntPtr,System.UInt32,System.IntPtr&)")]
 

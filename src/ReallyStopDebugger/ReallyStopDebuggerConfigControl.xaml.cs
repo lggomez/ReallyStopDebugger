@@ -7,11 +7,11 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using lggomez.ReallyStopDebugger.Common;
+using ReallyStopDebugger.Common;
 using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
 
-namespace lggomez.ReallyStopDebugger
+namespace ReallyStopDebugger
 {
     /// <summary>
     /// Interaction logic for MyControl.xaml

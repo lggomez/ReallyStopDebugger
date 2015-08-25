@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.Shell;
 using System;
 using System.Runtime.InteropServices;
 
-namespace lggomez.ReallyStopDebugger
+namespace ReallyStopDebugger
 {
     /// <summary>
     /// This class implements the tool window exposed by this package and hosts a user control.

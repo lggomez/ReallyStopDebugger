@@ -4,7 +4,7 @@
 // PkgCmdID.cs
 // MUST match PkgCmdID.h
 
-namespace lggomez.ReallyStopDebugger
+namespace ReallyStopDebugger
 {
     static class PkgCmdIDList
     {
