@@ -10,7 +10,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("lggomez")]
 [assembly: AssemblyProduct("ReallyStopDebugger")]
-[assembly: AssemblyCopyright("Copyright © lggomez 2015")]
+[assembly: AssemblyCopyright("Copyright © Luis Gómez 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
