@@ -24,7 +24,12 @@ namespace ReallyStopDebugger
         public MyControl()
         {
             InitializeComponent();
+
+            //Default control states
+            processCriteriaRadioButton_allProcesses.IsChecked = true;
+            userCriteriaRadioButton_allUsers.IsChecked = true;
             StatusLabel.Visibility = Visibility.Hidden;
+
             Loaded += ReallyStopDebuggerConfig_Loaded;
             Unloaded += ReallyStopDebuggerConfig_Unloaded;
         }
@@ -69,7 +74,7 @@ namespace ReallyStopDebugger
             #endregion
 
             var processNames = processesTextBox.Text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-            var result = ProcessHelper.KillProcesses(currentPackage, processNames, userProcessCheckBox.IsChecked.GetValueOrDefault());
+            var result = ProcessHelper.KillProcesses(currentPackage, processNames, userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault());
 
             if (forceCleanCheckBox.IsChecked.GetValueOrDefault() && !string.IsNullOrWhiteSpace(dte.Solution.FullName))
             {
@@ -172,9 +177,14 @@ namespace ReallyStopDebugger
                         forceCleanCheckBox.IsChecked = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "ForceClean"));
                     }
 
-                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "UserProcess"))
+                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "UserProcessMatch"))
                     {
-                        userProcessCheckBox.IsChecked = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "UserProcess"));
+                        userCriteriaRadioButton_userOnly.IsChecked = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "UserProcessMatch"));
+                    }
+
+                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ChildProcessMatch"))
+                    {
+                        userCriteriaRadioButton_userOnly.IsChecked = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "ChildProcessMatch"));
                     }
                 }
             }
@@ -198,7 +208,8 @@ namespace ReallyStopDebugger
 
                 userSettingsStore.SetString("ReallyStopDebugger", "ProcessList", processesTextBox.Text);
                 userSettingsStore.SetString("ReallyStopDebugger", "ForceClean", forceCleanCheckBox.IsChecked.GetValueOrDefault().ToString());
-                userSettingsStore.SetString("ReallyStopDebugger", "UserProcess", userProcessCheckBox.IsChecked.GetValueOrDefault().ToString());
+                userSettingsStore.SetString("ReallyStopDebugger", "UserProcessMatch", userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
+                userSettingsStore.SetString("ReallyStopDebugger", "ChildProcessMatch", userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
             }
 
             #endregion

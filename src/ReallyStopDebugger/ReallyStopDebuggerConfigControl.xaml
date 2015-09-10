@@ -37,12 +37,9 @@
 
         <TextBox Grid.Row="2" Grid.Column="0" x:Name="processesTextBox" TextWrapping="Wrap" Text="MSBuild&#xA;WebDev.WebServer40&#xA;Microsoft.VisualStudio.Web.Host" ToolTip="One process name per line" AcceptsReturn="True" Margin="0,0,10,46"/>
         <Label Grid.Row="2" Grid.Column="0" x:Name="StatusLabel" Content="StatusLabel&#xD;&#xA;StatusLabel" Margin="0,0,10,0" Height="41" VerticalAlignment="Bottom"/>
-        <CheckBox x:Name="userProcessCheckBox" 
-                  Foreground="{DynamicResource ResourceKey={x:Static vsui:EnvironmentColors.SystemMenuTextBrushKey}}"
-                  Content="Restrict to this user&#xD;&#xA;&#xD;&#xA;" Grid.Column="1" HorizontalAlignment="Left" Margin="0,10,0,0" Grid.Row="2" VerticalAlignment="Top" Width="140" Height="20" IsChecked="True" ToolTip="Restrict process matching to this user only"/>
         <CheckBox x:Name="forceCleanCheckBox" 
                   Foreground="{DynamicResource ResourceKey={x:Static vsui:EnvironmentColors.SystemMenuTextBrushKey}}"
-                  Content="Attempt to force &#xD;&#xA;clean solution" Grid.Column="1" HorizontalAlignment="Left" Margin="0,34,0,0" Grid.Row="2" VerticalAlignment="Top" Width="140"/>
+                  Content="Attempt to force &#xD;&#xA;clean solution" HorizontalAlignment="Left" Margin="0,102,0,0" Grid.Row="2" VerticalAlignment="Top" Width="140" Grid.Column="1"/>
         <Button Grid.Row="3" Content="_Stop debugging!" Click="killProcessesButton_Click" x:Name="killProcessesButton" IsDefault="True" 
         	ToolTip="This will kill the processes specified in the above textbox"
         	HorizontalAlignment="Center"
@@ -53,5 +50,24 @@
         	HorizontalAlignment="Center"
         	HorizontalContentAlignment="Center"
         	Width="150" Margin="81,10,101,10" Padding="2,2,2,2"/>
+        <RadioButton x:Name="userCriteriaRadioButton_userOnly" 
+                     Foreground="{DynamicResource ResourceKey={x:Static vsui:EnvironmentColors.SystemMenuTextBrushKey}}" 
+                     Content="This user only" Grid.Column="1" HorizontalAlignment="Left" Margin="10,31,0,0" Grid.Row="2" VerticalAlignment="Top" GroupName="userMatchOptions"/>
+        <RadioButton x:Name="userCriteriaRadioButton_allUsers" 
+                     Foreground="{DynamicResource ResourceKey={x:Static vsui:EnvironmentColors.SystemMenuTextBrushKey}}" 
+                     Content="All users'" Grid.Column="1" HorizontalAlignment="Left" Margin="10,16,0,0" Grid.Row="2" VerticalAlignment="Top" GroupName="userMatchOptions"/>
+        <Label x:Name="userCriteriaLabel" 
+               Foreground="{DynamicResource ResourceKey={x:Static vsui:EnvironmentColors.SystemMenuTextBrushKey}}" 
+               Content="User criteria:
+" HorizontalAlignment="Left" Height="23" Grid.Row="1" VerticalAlignment="Top" Width="140" Margin="0,29,0,0" Grid.RowSpan="2" Grid.Column="1"/>
+        <RadioButton x:Name="processCriteriaRadioButton_children" 
+                     Foreground="{DynamicResource ResourceKey={x:Static vsui:EnvironmentColors.SystemMenuTextBrushKey}}" 
+                     Content="Children only" Grid.Column="1" HorizontalAlignment="Left" Margin="10,82,0,0" Grid.Row="2" VerticalAlignment="Top" GroupName="processMatchOptions"/>
+        <RadioButton x:Name="processCriteriaRadioButton_allProcesses" 
+                     Foreground="{DynamicResource ResourceKey={x:Static vsui:EnvironmentColors.SystemMenuTextBrushKey}}" 
+                     Content="All processes" Grid.Column="1" HorizontalAlignment="Left" Margin="10,67,0,0" Grid.Row="2" VerticalAlignment="Top" GroupName="processMatchOptions"/>
+        <Label x:Name="processCriteriaLabel" 
+               Foreground="{DynamicResource ResourceKey={x:Static vsui:EnvironmentColors.SystemMenuTextBrushKey}}" 
+               Content="Process criteria: " Grid.Column="1" HorizontalAlignment="Left" Height="24" Grid.Row="2" VerticalAlignment="Top" Width="140" Margin="0,43,0,0"/>
     </Grid>
 </UserControl>
