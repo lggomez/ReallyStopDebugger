@@ -182,7 +182,7 @@
     <Compile Include="..\ReallyStopDebugger\ReallyStopDebuggerConfigControl.xaml.cs">
       <Link>ReallyStopDebuggerConfigControl.xaml.cs</Link>
     </Compile>
-    <Compile Include="MyToolWindow.cs" />
+    <Compile Include="ReallyStopDebuggerToolWindow.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
