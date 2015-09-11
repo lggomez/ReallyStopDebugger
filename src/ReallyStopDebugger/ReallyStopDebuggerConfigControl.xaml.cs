@@ -74,7 +74,11 @@ namespace ReallyStopDebugger
             #endregion
 
             var processNames = processesTextBox.Text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-            var result = ProcessHelper.KillProcesses(currentPackage, processNames, userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault());
+            var result = ProcessHelper.KillProcesses(
+                currentPackage, 
+                processNames, 
+                userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault(),
+                processCriteriaRadioButton_children.IsChecked.GetValueOrDefault());
 
             if (forceCleanCheckBox.IsChecked.GetValueOrDefault() && !string.IsNullOrWhiteSpace(dte.Solution.FullName))
             {
