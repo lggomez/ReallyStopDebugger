@@ -14,11 +14,15 @@ NOTE: If you are updating from version 0.9, you might need to reinstall the exte
 
 ##Usage
 ReallyStopDebugger has 2 modes (Tools menu):
-* Normal mode: In this mode you can set up which processes you want to kill (windowed), along with additional options:
- * Load childen - Loads all the childen processes of the current Visual Studio instance
- * Restrict to this user - Filters processes to the current user's only. Useful for shared development environments, such as VMs
- * Attempt to force clean solution - Will try to manually erase /bin and /obj directories in the solution. Requires VS to be run as Administrator to work properly
-* Silent mode: This mode just runs the extension as set up in the configuration window, and redirects status messages to the Output window (if available)
+* Normal mode: In this windowed mode you can set up which processes you want to target, along with additional options:
+* Silent mode: This mode runs the extension silently, as set up in the configuration window, and redirects status messages to the Output window (if available)
+
+##Configuration (normal mode)
+* User criteria - Lets you choose beteween targeting all proceses or only those running as your current user. Useful for shared development environments, such as VMs
+* Process criteria - Lets you add another filtering beteween all processes or only those spawned by the visual studio instance
+* Attempt to force clean solution - Will try to manually erase /bin and /obj directories in the solution. Requires VS to be run as Administrator to work properly
+
+All changes are saved after clowing the configuration window.
 
 ##Limitations
 * Processes will be handled with the same privilege as the VS's owner
@@ -26,8 +30,10 @@ ReallyStopDebugger has 2 modes (Tools menu):
 
 ##Dependencies
 To compile and run the solution Visual Studio 2015 Community (or higher) Edition is required, plus the VS 2015 SDK and a strong name key file (Key.snk) to compile and sign the assembly (you can disable this option in the project properties, Signing tab).
+
 Since version 1.1.2, Visual Studio 2013 (Update 5 or higher, with its SDK) can be used to work on the extension. Open the ReallyStopDebugger.v12.sln solution to work with VS 2013, or ReallyStopDebugger.v14.sln to work with VS 2015.
+WARNING: This solution may be outdated compared to its vs 2015 counterpart
 
 ##TODOs
-- Improve UI (in progress)
 - Improve directory cleaning support
+- Add keyboard shortcut commands

@@ -33,11 +33,11 @@ namespace ReallyStopDebugger
     [PackageRegistration(UseManagedResourcesOnly = true)]
     // This attribute is used to register the information needed to show this package
     // in the Help/About dialog of Visual Studio.
-    [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", "1.3", IconResourceID = 400)]
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
     // This attribute registers a tool window exposed by this package.
-    [ProvideToolWindow(typeof(MyToolWindow))]
+    [ProvideToolWindow(typeof(ReallyStopDebuggerToolWindow))]
     [Guid(GuidList.guidReallyStopDebuggerPkgString)]
     public sealed class ReallyStopDebuggerPackage : Package
     {
@@ -62,7 +62,7 @@ namespace ReallyStopDebugger
             // Get the instance number 0 of this tool window. This window is single instance so this instance
             // is actually the only one.
             // The last flag is set to true so that if the tool window does not exist it will be created.
-            MyToolWindow window = FindToolWindow(typeof(MyToolWindow), 0, true) as MyToolWindow;
+            ReallyStopDebuggerToolWindow window = FindToolWindow(typeof(ReallyStopDebuggerToolWindow), 0, true) as ReallyStopDebuggerToolWindow;
 
             if ((null == window) || (null == window.Frame))
             {
@@ -153,22 +153,15 @@ namespace ReallyStopDebugger
                 var dte = GetDte();
                 int result = -1;
 
-                try
-                {
-                    //Stop local VS debug
-                    if (dte != null)
-                    {
-                        dte.ExecuteCommand("Debug.StopDebugging");
-                    }
-                }
-                catch (COMException)
-                { //The command Debug.StopDebugging is not available (aka not in debug mode)
-                }
+                //Stop local VS debug/build
+                dte.TryExecuteCommand("Debug.StopDebugging");
+                dte.TryExecuteCommand("Build.Cancel");
 
                 #endregion
 
                 #region Configuration retrieval & process killing
 
+                //Default values. These may be overriden upon configuration store retrieval
                 var filter = new string[] { "MSBuild", "WebDev.WebServer40", "Microsoft.VisualStudio.Web.Host" };
 
                 SettingsStore configurationSettingsStore = (new ShellSettingsManager(this)).GetReadOnlySettingsStore(SettingsScope.UserSettings);
@@ -176,28 +169,37 @@ namespace ReallyStopDebugger
 
                 if (collectionExists)
                 {
+                    var filterByLocalUser = false;
+                    var filterByChildren = false;
+
                     if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ProcessList"))
                     {
                         filter = (configurationSettingsStore.GetString("ReallyStopDebugger", "ProcessList") ?? string.Empty).Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
                     }
 
-                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "UserProcess"))
+                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "UserProcessMatch") )
                     {
-                        var filterByLocalUser = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "UserProcess"));
-
-                        result = ProcessHelper.KillProcesses(this, filter.ToArray(), filterByLocalUser, true);
+                        filterByLocalUser = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "UserProcessMatch"));
                     }
+
+                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ChildProcessMatch"))
+                    {
+                        filterByChildren = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "ChildProcessMatch"));
+                    }
+
+                    result = ProcessHelper.KillProcesses(this, filter.ToArray(), filterByLocalUser, filterByChildren, true);
+                    
                 }
                 else
                 {
-                    result = ProcessHelper.KillProcesses(this, filter.ToArray(), false, true);
+                    result = ProcessHelper.KillProcesses(this, filter.ToArray(), false, false, true);
                 }
 
                 #endregion
 
                 if (collectionExists)
                 {
-                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "UserProcess"))
+                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ForceClean"))
                     {
                         var forceClean = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "ForceClean"));
 

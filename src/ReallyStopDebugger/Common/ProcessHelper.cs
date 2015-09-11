@@ -12,7 +12,7 @@ namespace ReallyStopDebugger.Common
 {
     internal static class ProcessHelper
     {
-        public static int KillProcesses(Package package, string[] processNames, bool restrictUser, bool consoleMode = false)
+        public static int KillProcesses(Package package, string[] processNames, bool restrictUser, bool restrictChildren, bool consoleMode = false)
         {
             string currentProcessName = string.Empty;
 
@@ -29,11 +29,22 @@ namespace ReallyStopDebugger.Common
                     runningProcesses = Process.GetProcesses().ToList();
                 }
 
-                List<Process> filteredProcesses = runningProcesses.Join(processNames,
+                var filteredProcesses = new List<Process>();
+
+                filteredProcesses = runningProcesses.Join(processNames,
                     p => (p.ProcessName ?? string.Empty).ToLower(),
                     n => (n ?? string.Empty).ToLower(),
                     (p, n) => p)
                     .ToList();
+
+                if (restrictChildren)
+                {
+                    var childProcesses = WindowsInterop.GetChildProcesses(WindowsInterop.GetCurrentProcess().Id);
+
+                    filteredProcesses = (from p in filteredProcesses
+                                         join c in childProcesses on p.Id equals c.Id
+                                         select p).ToList();
+                }
 
                 if (!filteredProcesses.Any())
                     return Constants.PROCESSESNOTFOUND;

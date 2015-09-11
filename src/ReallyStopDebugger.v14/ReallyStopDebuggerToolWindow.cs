@@ -17,14 +17,14 @@ namespace ReallyStopDebugger
     /// implementation of the IVsUIElementPane interface.
     /// </summary>
     [Guid(GuidList.guidToolWindowPersistanceString)]
-    public class MyToolWindow : ToolWindowPane
+    public class ReallyStopDebuggerToolWindow : ToolWindowPane
     {
         internal Package currentPackage { get; set; }
 
         /// <summary>
         /// Standard constructor for the tool window.
         /// </summary>
-        public MyToolWindow() :
+        public ReallyStopDebuggerToolWindow() :
             base(null)
         {
             // Set the window title reading it from the resources.
