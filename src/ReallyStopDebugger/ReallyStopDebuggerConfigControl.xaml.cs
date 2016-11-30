@@ -30,6 +30,7 @@ namespace ReallyStopDebugger
             this.userCriteriaRadioButton_allUsers.IsChecked = true;
             this.StatusLabel.Visibility = Visibility.Hidden;
 
+
             this.Loaded += this.ReallyStopDebuggerConfig_Loaded;
             this.Unloaded += this.ReallyStopDebuggerConfig_Unloaded;
         }
@@ -121,6 +122,7 @@ namespace ReallyStopDebugger
             this.processDisplayDataGrid.ItemsSource = null;
             var childProcesses = WindowsInterop.GetChildProcesses(WindowsInterop.GetCurrentProcess().Id);
 
+            //TODO: Remove this on release
             var processes = WindowsInterop.GetCurrentUserProcesses();
             childProcesses.AddRange(processes);
 
@@ -152,9 +154,10 @@ namespace ReallyStopDebugger
 
                 if (collectionExists)
                 {
-                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ProcessList"))
+                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "CustomProcessList"))
                     {
-                        //this.processesTextBox.Text = configurationSettingsStore.GetString("ReallyStopDebugger", "ProcessList") ?? string.Empty;
+                        this.processCustomDisplayDataGrid.ItemsSource = (configurationSettingsStore.GetString("ReallyStopDebugger", "CustomProcessList") ?? string.Empty)
+                            .Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
                     }
 
                     if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ForceClean"))
@@ -191,7 +194,7 @@ namespace ReallyStopDebugger
                     userSettingsStore.CreateCollection("ReallyStopDebugger");
                 }
 
-                //userSettingsStore.SetString("ReallyStopDebugger", "ProcessList", this.processesTextBox.Text);
+                userSettingsStore.SetString("ReallyStopDebugger", "CustomProcessList", string.Join("\r\n", this.processCustomDisplayDataGrid.ItemsSource.Cast<string>()));
                 userSettingsStore.SetString("ReallyStopDebugger", "ForceClean", this.forceCleanCheckBox.IsChecked.GetValueOrDefault().ToString());
                 userSettingsStore.SetString("ReallyStopDebugger", "UserProcessMatch", this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
                 userSettingsStore.SetString("ReallyStopDebugger", "ChildProcessMatch", this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());

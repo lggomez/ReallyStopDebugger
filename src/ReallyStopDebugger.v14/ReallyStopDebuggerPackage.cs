@@ -181,9 +181,9 @@ namespace ReallyStopDebugger
                     var filterByLocalUser = false;
                     var filterByChildren = false;
 
-                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ProcessList"))
+                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "CustomProcessList"))
                     {
-                        filter = (configurationSettingsStore.GetString("ReallyStopDebugger", "ProcessList") ?? string.Empty).Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+                        filter = (configurationSettingsStore.GetString("ReallyStopDebugger", "CustomProcessList") ?? string.Empty).Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
                     }
 
                     if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "UserProcessMatch") )
