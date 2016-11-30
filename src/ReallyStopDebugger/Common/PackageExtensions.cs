@@ -9,7 +9,8 @@ namespace ReallyStopDebugger.Common
 {
     internal static class PackageExtensions
     {
-        public static void ShowErrorMessage(this Package package, string message, string title){
+        public static void ShowErrorMessage(this Package package, string message, string title)
+        {
             ErrorHandler.ThrowOnFailure(VsShellUtilities.ShowMessageBox(
                 package,
                 message,

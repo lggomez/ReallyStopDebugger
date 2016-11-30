@@ -62,7 +62,7 @@ namespace ReallyStopDebugger.Common
             NoH
         }
 
-        //Token security access
+        // Token security access
         public const uint STANDARD_RIGHTS_REQUIRED = 0x000F0000;
         public const uint STANDARD_RIGHTS_READ = 0x00020000;
         public const uint TOKEN_ASSIGN_PRIMARY = 0x0001;
@@ -117,7 +117,7 @@ namespace ReallyStopDebugger.Common
              int processId);
 
         [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Ansi)]
-        static extern IntPtr CreateToolhelp32Snapshot([In]UInt32 dwFlags, [In]UInt32 th32ProcessId);
+        static extern IntPtr CreateToolhelp32Snapshot([In]uint dwFlags, [In]uint th32ProcessId);
 
         [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Ansi)]
         static extern bool Process32First([In]IntPtr hSnapshot, ref PROCESSENTRY32 lppe);
@@ -167,7 +167,7 @@ namespace ReallyStopDebugger.Common
 
             try
             {
-                var targetSize = (UInt32)Marshal.SizeOf(typeof(PROCESSENTRY32));
+                var targetSize = (uint)Marshal.SizeOf(typeof(PROCESSENTRY32));
                 var processEntry = new PROCESSENTRY32 { dwSize = targetSize };
                 snapshotHandle = CreateToolhelp32Snapshot((uint)SnapshotFlags.Process, 0);
 
@@ -262,7 +262,7 @@ namespace ReallyStopDebugger.Common
                 {
                     // Failure to obtain user SID indicates that the process is either in an
                     // invalid state or we have access denied, so we ignore it
-                    if ((ex is InvalidOperationException) || (ex is Win32Exception))
+                    if (ex is InvalidOperationException || (ex is Win32Exception))
                         continue;
                 }
 

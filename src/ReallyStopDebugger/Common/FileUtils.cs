@@ -36,7 +36,7 @@ namespace ReallyStopDebugger.Common
                 info.Attributes = FileAttributes.Normal;
             }
 
-            if (Path.GetFileName(path).Equals(match, System.StringComparison.InvariantCultureIgnoreCase))
+            if (Path.GetFileName(path).Equals(match, StringComparison.InvariantCultureIgnoreCase))
             {
                 directory.Delete(true);
             }

@@ -23,15 +23,15 @@ namespace ReallyStopDebugger
 
         public MyControl()
         {
-            InitializeComponent();
+            this.InitializeComponent();
 
-            //Default control states
-            processCriteriaRadioButton_allProcesses.IsChecked = true;
-            userCriteriaRadioButton_allUsers.IsChecked = true;
-            StatusLabel.Visibility = Visibility.Hidden;
+            // Default control states
+            this.processCriteriaRadioButton_allProcesses.IsChecked = true;
+            this.userCriteriaRadioButton_allUsers.IsChecked = true;
+            this.StatusLabel.Visibility = Visibility.Hidden;
 
-            Loaded += ReallyStopDebuggerConfig_Loaded;
-            Unloaded += ReallyStopDebuggerConfig_Unloaded;
+            this.Loaded += this.ReallyStopDebuggerConfig_Loaded;
+            this.Unloaded += this.ReallyStopDebuggerConfig_Unloaded;
         }
 
         #region Click events
@@ -40,54 +40,52 @@ namespace ReallyStopDebugger
         {
             #region Initialize
 
-            if (currentPackage == null)
+            if (this.currentPackage == null)
             {
-                //The control was loaded in a faulted way or before the package initialization
-                StatusLabel.Content = string.Format("Visual Studio instance not found.{0}Please reopen this window and try again", Environment.NewLine);
-                StatusLabel.Foreground = Brushes.Red;
-                StatusLabel.Visibility = Visibility.Visible;
+                // The control was loaded in a faulted way or before the package initialization
+                this.StatusLabel.Content = string.Format("Visual Studio instance not found.{0}Please reopen this window and try again", Environment.NewLine);
+                this.StatusLabel.Foreground = Brushes.Red;
+                this.StatusLabel.Visibility = Visibility.Visible;
                 return;
             }
             else
             {
-                StatusLabel.Content = string.Empty;
+                this.StatusLabel.Content = string.Empty;
             }
 
             #endregion
 
             #region Stop debug mode
 
-            var dte = ((ReallyStopDebuggerPackage)currentPackage).GetDte();
+            var dte = ((ReallyStopDebuggerPackage)this.currentPackage).GetDte();
 
             try
             {
-                //Stop local VS debug
+                // Stop local VS debug
                 if (dte != null)
                 {
                     dte.ExecuteCommand("Debug.StopDebugging");
                 }
             }
             catch (COMException)
-            { //The command Debug.StopDebugging is not available
+            { 
+                // The command Debug.StopDebugging is not available
             }
 
             #endregion
 
-            var processNames = processesTextBox.Text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-            var result = ProcessHelper.KillProcesses(
-                currentPackage, 
-                processNames, 
-                userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault(),
-                processCriteriaRadioButton_children.IsChecked.GetValueOrDefault());
+            var processNames = this.processesTextBox.Text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+            var result = ProcessHelper.KillProcesses(this.currentPackage, 
+                processNames, this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault(), this.processCriteriaRadioButton_children.IsChecked.GetValueOrDefault());
 
-            if (forceCleanCheckBox.IsChecked.GetValueOrDefault() && !string.IsNullOrWhiteSpace(dte.Solution.FullName))
+            if (this.forceCleanCheckBox.IsChecked.GetValueOrDefault() && !string.IsNullOrWhiteSpace(dte.Solution.FullName))
             {
                 FileUtils.AttemptHardClean(dte);
             }
 
             #region UI update
 
-            StatusLabel.Visibility = Visibility.Visible;
+            this.StatusLabel.Visibility = Visibility.Visible;
 
             string returnMessage;
 
@@ -96,24 +94,24 @@ namespace ReallyStopDebugger
                 case Constants.PROCESSESKILLSUCCESS:
                     {
                         returnMessage = "Processes killed.";
-                        StatusLabel.Foreground = Brushes.Green;
+                        this.StatusLabel.Foreground = Brushes.Green;
                         break;
                     }
                 case Constants.PROCESSESNOTFOUND:
                     {
                         returnMessage = "Could not find any matching processes.";
-                        StatusLabel.Foreground = Brushes.Orange;
+                        this.StatusLabel.Foreground = Brushes.Orange;
                         break;
                     }
                 default:
                     {
                         returnMessage = "Could not close orphaned processes due to an error.";
-                        StatusLabel.Foreground = Brushes.Red;
+                        this.StatusLabel.Foreground = Brushes.Red;
                         break;
                     }
             }
 
-            StatusLabel.Content = returnMessage;
+            this.StatusLabel.Content = returnMessage;
 
             #endregion
         }
@@ -129,7 +127,7 @@ namespace ReallyStopDebugger
                     .Select(g => g.First().ProcessName)
                     .ToList();
 
-                var processesNames = processesTextBox.Text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None).ToList();
+                var processesNames = this.processesTextBox.Text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None).ToList();
                 processesNames.AddRange(childProcessesNames);
 
                 processesNames = processesNames
@@ -137,18 +135,18 @@ namespace ReallyStopDebugger
                     .Select(_ => _.First())
                     .ToList();
 
-                processesTextBox.Text = string.Empty;
+                this.processesTextBox.Text = string.Empty;
 
                 processesNames.ForEach(
                     _ =>
                         {
-                            if (!string.IsNullOrWhiteSpace(processesTextBox.Text))
+                            if (!string.IsNullOrWhiteSpace(this.processesTextBox.Text))
                             {
-                                processesTextBox.Text += Environment.NewLine + _.Trim();
+                                this.processesTextBox.Text += Environment.NewLine + _.Trim();
                             }
                             else
                             {
-                                processesTextBox.Text += _.Trim();
+                                this.processesTextBox.Text += _.Trim();
                             }
                         });
             }
@@ -160,35 +158,35 @@ namespace ReallyStopDebugger
 
         private void ReallyStopDebuggerConfig_Loaded(object sender, RoutedEventArgs e)
         {
-            StatusLabel.Content = string.Empty;
+            this.StatusLabel.Content = string.Empty;
 
             #region Load settings
 
-            if (settingsManager != null)
+            if (this.settingsManager != null)
             {
-                var configurationSettingsStore = settingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
+                var configurationSettingsStore = this.settingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
                 var collectionExists = configurationSettingsStore.CollectionExists("ReallyStopDebugger");
 
                 if (collectionExists)
                 {
                     if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ProcessList"))
                     {
-                        processesTextBox.Text = configurationSettingsStore.GetString("ReallyStopDebugger", "ProcessList") ?? string.Empty;
+                        this.processesTextBox.Text = configurationSettingsStore.GetString("ReallyStopDebugger", "ProcessList") ?? string.Empty;
                     }
 
                     if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ForceClean"))
                     {
-                        forceCleanCheckBox.IsChecked = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "ForceClean"));
+                        this.forceCleanCheckBox.IsChecked = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "ForceClean"));
                     }
 
                     if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "UserProcessMatch"))
                     {
-                        userCriteriaRadioButton_userOnly.IsChecked = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "UserProcessMatch"));
+                        this.userCriteriaRadioButton_userOnly.IsChecked = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "UserProcessMatch"));
                     }
 
                     if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ChildProcessMatch"))
                     {
-                        userCriteriaRadioButton_userOnly.IsChecked = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "ChildProcessMatch"));
+                        this.userCriteriaRadioButton_userOnly.IsChecked = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "ChildProcessMatch"));
                     }
                 }
             }
@@ -200,9 +198,9 @@ namespace ReallyStopDebugger
         {
             #region Save settings
 
-            if (settingsManager != null)
+            if (this.settingsManager != null)
             {
-                var userSettingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
+                var userSettingsStore = this.settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
                 var collectionExists = userSettingsStore.CollectionExists("ReallyStopDebugger");
 
                 if (!collectionExists)
@@ -210,10 +208,10 @@ namespace ReallyStopDebugger
                     userSettingsStore.CreateCollection("ReallyStopDebugger");
                 }
 
-                userSettingsStore.SetString("ReallyStopDebugger", "ProcessList", processesTextBox.Text);
-                userSettingsStore.SetString("ReallyStopDebugger", "ForceClean", forceCleanCheckBox.IsChecked.GetValueOrDefault().ToString());
-                userSettingsStore.SetString("ReallyStopDebugger", "UserProcessMatch", userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
-                userSettingsStore.SetString("ReallyStopDebugger", "ChildProcessMatch", userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
+                userSettingsStore.SetString("ReallyStopDebugger", "ProcessList", this.processesTextBox.Text);
+                userSettingsStore.SetString("ReallyStopDebugger", "ForceClean", this.forceCleanCheckBox.IsChecked.GetValueOrDefault().ToString());
+                userSettingsStore.SetString("ReallyStopDebugger", "UserProcessMatch", this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
+                userSettingsStore.SetString("ReallyStopDebugger", "ChildProcessMatch", this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
             }
 
             #endregion

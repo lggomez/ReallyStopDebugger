@@ -3,7 +3,6 @@
 
 using Microsoft.VisualStudio.Shell;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Process = System.Diagnostics.Process;
@@ -18,23 +17,15 @@ namespace ReallyStopDebugger.Common
 
             try
             {
-                var runningProcesses = new List<Process>();
+                var runningProcesses = restrictUser ? 
+                                            WindowsInterop.GetCurrentUserProcesses() : 
+                                            Process.GetProcesses().ToList();
 
-                if (restrictUser)
-                {
-                    runningProcesses = WindowsInterop.GetCurrentUserProcesses();
-                }
-                else
-                {
-                    runningProcesses = Process.GetProcesses().ToList();
-                }
-
-                var filteredProcesses = new List<Process>();
-
-                filteredProcesses = runningProcesses.Join(processNames,
-                    p => (p.ProcessName ?? string.Empty).ToLower(),
-                    n => (n ?? string.Empty).ToLower(),
-                    (p, n) => p)
+                var filteredProcesses = runningProcesses
+                    .Join(processNames,
+                        p => (p.ProcessName).ToLower(),
+                        n => (n ?? string.Empty).ToLower(),
+                        (p, n) => p)
                     .ToList();
 
                 if (restrictChildren)
@@ -59,7 +50,7 @@ namespace ReallyStopDebugger.Common
             {
                 if (!consoleMode)
                 {
-                    package.ShowErrorMessage(string.Format("The associated process could not be terminated, is terminating or is an invalid Win32 process."), "Error killing process: " + currentProcessName);
+                    package.ShowErrorMessage("The associated process could not be terminated, is terminating or is an invalid Win32 process.", "Error killing process: " + currentProcessName);
                 }
                 return Constants.PROCESSESKILLERROR;
             }
@@ -67,7 +58,7 @@ namespace ReallyStopDebugger.Common
             {
                 if (!consoleMode)
                 {
-                    package.ShowErrorMessage(string.Format("Cannot kill a process running on a remote computer. Aborting."), "Error killing process: " + currentProcessName);
+                    package.ShowErrorMessage("Cannot kill a process running on a remote computer. Aborting.", "Error killing process: " + currentProcessName);
                 }
                 return Constants.PROCESSESKILLERROR;
             }
@@ -75,7 +66,7 @@ namespace ReallyStopDebugger.Common
             {
                 if (!consoleMode)
                 {
-                    package.ShowErrorMessage(string.Format("The process has already exited or was not found."), "Error killing process: " + currentProcessName);
+                    package.ShowErrorMessage("The process has already exited or was not found.", "Error killing process: " + currentProcessName);
                 }
                 return Constants.PROCESSESKILLERROR;
             }

@@ -1,3 +1,6 @@
+v1.4
+	-Fix: Code cleanup
+
 v1.3
 	-Fix: Force delete previous value retrieval
 	-Fix: Now the addin activation stops the build before targeting msbuild 

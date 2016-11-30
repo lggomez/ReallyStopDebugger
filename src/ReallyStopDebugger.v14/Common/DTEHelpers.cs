@@ -15,7 +15,8 @@ namespace ReallyStopDebugger.Common
                 }
             }
             catch (COMException)
-            { //The command Debug.StopDebugging is not available (aka not in debug mode)
+            {
+                // The command Debug.StopDebugging is not available (aka not in debug mode)
             }
         }
     }

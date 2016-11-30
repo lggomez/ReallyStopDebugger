@@ -31,11 +31,14 @@ namespace ReallyStopDebugger
     // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is
     // a package.
     [PackageRegistration(UseManagedResourcesOnly = true)]
+
     // This attribute is used to register the information needed to show this package
     // in the Help/About dialog of Visual Studio.
     [InstalledProductRegistration("#110", "#112", "1.3", IconResourceID = 400)]
+
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
+
     // This attribute registers a tool window exposed by this package.
     [ProvideToolWindow(typeof(ReallyStopDebuggerToolWindow))]
     [Guid(GuidList.guidReallyStopDebuggerPkgString)]
@@ -62,23 +65,21 @@ namespace ReallyStopDebugger
             // Get the instance number 0 of this tool window. This window is single instance so this instance
             // is actually the only one.
             // The last flag is set to true so that if the tool window does not exist it will be created.
-            ReallyStopDebuggerToolWindow window = FindToolWindow(typeof(ReallyStopDebuggerToolWindow), 0, true) as ReallyStopDebuggerToolWindow;
+            ReallyStopDebuggerToolWindow window = this.FindToolWindow(typeof(ReallyStopDebuggerToolWindow), 0, true) as ReallyStopDebuggerToolWindow;
 
             if ((null == window) || (null == window.Frame))
             {
                 throw new NotSupportedException(Resources.CanNotCreateWindow);
             }
-            else
-            {
-                window.currentPackage = this;
 
-                IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
+            window.currentPackage = this;
 
-                ((MyControl)window.Content).currentPackage = this;
-                ((MyControl)window.Content).settingsManager = new ShellSettingsManager(this);
+            IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
 
-                ErrorHandler.ThrowOnFailure(windowFrame.Show());
-            }
+            ((MyControl)window.Content).currentPackage = this;
+            ((MyControl)window.Content).settingsManager = new ShellSettingsManager(this);
+
+            ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
 
         /////////////////////////////////////////////////////////////////////////////
@@ -94,21 +95,29 @@ namespace ReallyStopDebugger
             base.Initialize();
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
-            OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+            OleMenuCommandService mcs = this.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
 
             if (null != mcs)
             {
                 // Create the command for the cfg menu item.
-                CommandID menuCommandID = new CommandID(GuidList.guidReallyStopDebuggerCmdSet, (int)PkgCmdIDList.cmdidReallyStopDebugger);
-                MenuCommand menuItem = new MenuCommand(MenuItemCallback, menuCommandID );
+                CommandID menuCommandID = new CommandID(
+                                              GuidList.guidReallyStopDebuggerCmdSet,
+                                              (int)PkgCmdIDList.cmdidReallyStopDebugger);
+                MenuCommand menuItem = new MenuCommand(this.MenuItemCallback, menuCommandID);
                 mcs.AddCommand(menuItem);
+
                 // Create the command for the lite version menu item.
-                CommandID menuCommandID2 = new CommandID(GuidList.guidReallyStopDebuggerCmdSet, (int)PkgCmdIDList.cmdidReallyStopDebuggerLite);
-                MenuCommand menuItem2 = new MenuCommand(MenuItemCallbackLite, menuCommandID2);
+                CommandID menuCommandID2 = new CommandID(
+                                               GuidList.guidReallyStopDebuggerCmdSet,
+                                               (int)PkgCmdIDList.cmdidReallyStopDebuggerLite);
+                MenuCommand menuItem2 = new MenuCommand(this.MenuItemCallbackLite, menuCommandID2);
                 mcs.AddCommand(menuItem2);
+
                 // Create the command for the tool window
-                CommandID toolwndCommandID = new CommandID(GuidList.guidReallyStopDebuggerCmdSet, (int)PkgCmdIDList.cmdidReallyStopDebuggerCfg);
-                MenuCommand menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
+                CommandID toolwndCommandID = new CommandID(
+                                                 GuidList.guidReallyStopDebuggerCmdSet,
+                                                 (int)PkgCmdIDList.cmdidReallyStopDebuggerCfg);
+                MenuCommand menuToolWin = new MenuCommand(this.ShowToolWindow, toolwndCommandID);
                 mcs.AddCommand(menuToolWin);
             }
         }
@@ -120,7 +129,7 @@ namespace ReallyStopDebugger
         /// <returns>The DTE instance, or null if no instance could be resolved</returns>
         public DTE GetDte()
         {
-            return (DTE)GetService(typeof(DTE));
+            return (DTE)this.GetService(typeof(DTE));
         }
 
         /// <summary>
@@ -132,7 +141,7 @@ namespace ReallyStopDebugger
         {
             try
             {
-                ShowToolWindow(sender, e);
+                this.ShowToolWindow(sender, e);
             }
             catch (Exception ex)
             {
@@ -150,10 +159,10 @@ namespace ReallyStopDebugger
             try
             {
                 #region Stop debug mode
-                var dte = GetDte();
-                int result = -1;
+                var dte = this.GetDte();
+                int result;
 
-                //Stop local VS debug/build
+                // Stop local VS debug/build
                 dte.TryExecuteCommand("Debug.StopDebugging");
                 dte.TryExecuteCommand("Build.Cancel");
 
@@ -161,7 +170,7 @@ namespace ReallyStopDebugger
 
                 #region Configuration retrieval & process killing
 
-                //Default values. These may be overriden upon configuration store retrieval
+                // Default values. These may be overriden upon configuration store retrieval
                 var filter = new string[] { "MSBuild", "WebDev.WebServer40", "Microsoft.VisualStudio.Web.Host" };
 
                 SettingsStore configurationSettingsStore = (new ShellSettingsManager(this)).GetReadOnlySettingsStore(SettingsScope.UserSettings);
@@ -205,7 +214,7 @@ namespace ReallyStopDebugger
 
                         if (forceClean && !string.IsNullOrWhiteSpace(dte.Solution.FullName))
                         {
-                            Common.FileUtils.AttemptHardClean(dte);
+                            FileUtils.AttemptHardClean(dte);
                         }
                     }
                 }
@@ -215,11 +224,10 @@ namespace ReallyStopDebugger
                 string returnMessage;
 
                 // Find the output window.
-                Window window = GetDte().Windows.Item(Constants.vsWindowKindOutput);
+                Window window = this.GetDte().Windows.Item(Constants.vsWindowKindOutput);
                 OutputWindow outputWindow = (OutputWindow)window.Object;
 
-                OutputWindowPane owp;
-                owp = outputWindow.OutputWindowPanes.Add("Output");
+                OutputWindowPane owp = outputWindow.OutputWindowPanes.Add("Output");
 
                 switch (result)
                 {
