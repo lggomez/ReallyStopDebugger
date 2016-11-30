@@ -74,9 +74,9 @@ namespace ReallyStopDebugger
 
             #endregion
 
-            var processNames = this.processesTextBox.Text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
             var result = ProcessHelper.KillProcesses(this.currentPackage, 
-                processNames, this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault(), this.processCriteriaRadioButton_children.IsChecked.GetValueOrDefault());
+                this.processDisplayDataGrid.SelectedItems, this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault(), 
+                this.processCriteriaRadioButton_children.IsChecked.GetValueOrDefault());
 
             if (this.forceCleanCheckBox.IsChecked.GetValueOrDefault() && !string.IsNullOrWhiteSpace(dte.Solution.FullName))
             {
@@ -118,37 +118,20 @@ namespace ReallyStopDebugger
 
         private void loadChildProcessesButton_Click(object sender, RoutedEventArgs e)
         {
+            this.processDisplayDataGrid.ItemsSource = null;
             var childProcesses = WindowsInterop.GetChildProcesses(WindowsInterop.GetCurrentProcess().Id);
+
+            var processes = WindowsInterop.GetCurrentUserProcesses();
+            childProcesses.AddRange(processes);
 
             if (childProcesses.Any())
             {
                 var childProcessesNames = childProcesses
                     .GroupBy(p => p.ProcessName, StringComparer.InvariantCultureIgnoreCase)
-                    .Select(g => g.First().ProcessName)
+                    .Select(g => new ProcessInfo(g.First()))
                     .ToList();
 
-                var processesNames = this.processesTextBox.Text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None).ToList();
-                processesNames.AddRange(childProcessesNames);
-
-                processesNames = processesNames
-                    .GroupBy(_ => _, StringComparer.InvariantCultureIgnoreCase)
-                    .Select(_ => _.First())
-                    .ToList();
-
-                this.processesTextBox.Text = string.Empty;
-
-                processesNames.ForEach(
-                    _ =>
-                        {
-                            if (!string.IsNullOrWhiteSpace(this.processesTextBox.Text))
-                            {
-                                this.processesTextBox.Text += Environment.NewLine + _.Trim();
-                            }
-                            else
-                            {
-                                this.processesTextBox.Text += _.Trim();
-                            }
-                        });
+                this.processDisplayDataGrid.ItemsSource = childProcessesNames;
             }
         }
 
@@ -171,7 +154,7 @@ namespace ReallyStopDebugger
                 {
                     if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ProcessList"))
                     {
-                        this.processesTextBox.Text = configurationSettingsStore.GetString("ReallyStopDebugger", "ProcessList") ?? string.Empty;
+                        //this.processesTextBox.Text = configurationSettingsStore.GetString("ReallyStopDebugger", "ProcessList") ?? string.Empty;
                     }
 
                     if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ForceClean"))
@@ -208,7 +191,7 @@ namespace ReallyStopDebugger
                     userSettingsStore.CreateCollection("ReallyStopDebugger");
                 }
 
-                userSettingsStore.SetString("ReallyStopDebugger", "ProcessList", this.processesTextBox.Text);
+                //userSettingsStore.SetString("ReallyStopDebugger", "ProcessList", this.processesTextBox.Text);
                 userSettingsStore.SetString("ReallyStopDebugger", "ForceClean", this.forceCleanCheckBox.IsChecked.GetValueOrDefault().ToString());
                 userSettingsStore.SetString("ReallyStopDebugger", "UserProcessMatch", this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
                 userSettingsStore.SetString("ReallyStopDebugger", "ChildProcessMatch", this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());

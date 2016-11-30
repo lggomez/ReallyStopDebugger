@@ -3,6 +3,7 @@
 
 using Microsoft.VisualStudio.Shell;
 using System;
+using System.Collections;
 using System.ComponentModel;
 using System.Linq;
 using Process = System.Diagnostics.Process;
@@ -11,7 +12,7 @@ namespace ReallyStopDebugger.Common
 {
     internal static class ProcessHelper
     {
-        public static int KillProcesses(Package package, string[] processNames, bool restrictUser, bool restrictChildren, bool consoleMode = false)
+        public static int KillProcesses(Package package, IList processNames, bool restrictUser, bool restrictChildren, bool consoleMode = false)
         {
             string currentProcessName = string.Empty;
 
@@ -22,7 +23,7 @@ namespace ReallyStopDebugger.Common
                                             Process.GetProcesses().ToList();
 
                 var filteredProcesses = runningProcesses
-                    .Join(processNames,
+                    .Join(processNames.Cast<string>(),
                         p => (p.ProcessName).ToLower(),
                         n => (n ?? string.Empty).ToLower(),
                         (p, n) => p)
