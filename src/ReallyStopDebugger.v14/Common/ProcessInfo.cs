@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ReallyStopDebugger
 {
@@ -9,7 +11,6 @@ namespace ReallyStopDebugger
         public int Id
         {
             get
-
             {
                 return this.originProcess.Id;
             }
@@ -20,7 +21,6 @@ namespace ReallyStopDebugger
         public string ProcessName
         {
             get
-
             {
                 return this.originProcess.ProcessName;
             }
@@ -32,9 +32,14 @@ namespace ReallyStopDebugger
 
         public string WorkingDirectory { get; }
 
-        public ProcessInfo(Process process)
+        public int ProcessCount { get; }
+
+        public bool IsSelected { get; set; }
+
+        public ProcessInfo(IEnumerable<Process> processes)
         {
-            this.originProcess = process;
+            this.originProcess = processes.First();
+            this.ProcessCount = processes.Count();
         }
     }
 }

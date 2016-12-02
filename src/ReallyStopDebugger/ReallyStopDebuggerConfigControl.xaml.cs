@@ -2,12 +2,15 @@
 // Licensed under the MIT license. See LICENSE file in the src\ReallyStopDebugger directory for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+
 using ReallyStopDebugger.Common;
+
 using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
 
@@ -19,7 +22,12 @@ namespace ReallyStopDebugger
     public partial class MyControl : UserControl
     {
         internal Package currentPackage { get; set; }
+
         internal SettingsManager settingsManager { get; set; }
+
+        public List<ProcessInfo> Processes { get; set; } = new List<ProcessInfo>();
+
+        public bool AllProcessesSelected { get; set; } = false;
 
         public MyControl()
         {
@@ -30,12 +38,11 @@ namespace ReallyStopDebugger
             this.userCriteriaRadioButton_allUsers.IsChecked = true;
             this.StatusLabel.Visibility = Visibility.Hidden;
 
-
             this.Loaded += this.ReallyStopDebuggerConfig_Loaded;
             this.Unloaded += this.ReallyStopDebuggerConfig_Unloaded;
         }
 
-        #region Click events
+        #region Control events
 
         private void killProcessesButton_Click(object sender, RoutedEventArgs e)
         {
@@ -44,15 +51,16 @@ namespace ReallyStopDebugger
             if (this.currentPackage == null)
             {
                 // The control was loaded in a faulted way or before the package initialization
-                this.StatusLabel.Content = string.Format("Visual Studio instance not found.{0}Please reopen this window and try again", Environment.NewLine);
+                this.StatusLabel.Content =
+                    string.Format(
+                        "Visual Studio instance not found.{0}Please reopen this window and try again",
+                        Environment.NewLine);
                 this.StatusLabel.Foreground = Brushes.Red;
                 this.StatusLabel.Visibility = Visibility.Visible;
                 return;
             }
-            else
-            {
-                this.StatusLabel.Content = string.Empty;
-            }
+
+            this.StatusLabel.Content = string.Empty;
 
             #endregion
 
@@ -69,17 +77,20 @@ namespace ReallyStopDebugger
                 }
             }
             catch (COMException)
-            { 
+            {
                 // The command Debug.StopDebugging is not available
             }
 
             #endregion
 
-            var result = ProcessHelper.KillProcesses(this.currentPackage, 
-                this.processDisplayDataGrid.SelectedItems, this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault(), 
+            var result = ProcessHelper.KillProcesses(
+                this.currentPackage,
+                this.processDisplayDataGrid.ItemsSource.Cast<ProcessInfo>().Where(p => p.IsSelected).Select(_ => _.ProcessName).ToList(),
+                this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault(),
                 this.processCriteriaRadioButton_children.IsChecked.GetValueOrDefault());
 
-            if (this.forceCleanCheckBox.IsChecked.GetValueOrDefault() && !string.IsNullOrWhiteSpace(dte.Solution.FullName))
+            if (this.forceCleanCheckBox.IsChecked.GetValueOrDefault()
+                && !string.IsNullOrWhiteSpace(dte.Solution.FullName))
             {
                 FileUtils.AttemptHardClean(dte);
             }
@@ -119,22 +130,31 @@ namespace ReallyStopDebugger
 
         private void loadChildProcessesButton_Click(object sender, RoutedEventArgs e)
         {
-            this.processDisplayDataGrid.ItemsSource = null;
             var childProcesses = WindowsInterop.GetChildProcesses(WindowsInterop.GetCurrentProcess().Id);
 
-            //TODO: Remove this on release
+            // TODO: Remove this on release
+#if DEBUG
             var processes = WindowsInterop.GetCurrentUserProcesses();
             childProcesses.AddRange(processes);
+#endif
 
             if (childProcesses.Any())
             {
-                var childProcessesNames = childProcesses
-                    .GroupBy(p => p.ProcessName, StringComparer.InvariantCultureIgnoreCase)
-                    .Select(g => new ProcessInfo(g.First()))
-                    .ToList();
+                var childProcessesInfo =
+                    childProcesses.GroupBy(p => p.ProcessName, StringComparer.InvariantCultureIgnoreCase)
+                        .Select(g => new ProcessInfo(g))
+                        .ToList();
 
-                this.processDisplayDataGrid.ItemsSource = childProcessesNames;
+                this.AllProcessesSelected = false;
+                this.Processes = childProcessesInfo;
+                this.RefreshProcessDisplayDataGrid();
             }
+        }
+
+        private void ProcessSelectionHeader_OnChecked(object sender, RoutedEventArgs e)
+        {
+            this.Processes.ForEach(p => { p.IsSelected = this.AllProcessesSelected; });
+            this.RefreshProcessDisplayDataGrid();
         }
 
         #endregion
@@ -149,30 +169,37 @@ namespace ReallyStopDebugger
 
             if (this.settingsManager != null)
             {
-                var configurationSettingsStore = this.settingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
+                var configurationSettingsStore =
+                    this.settingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
                 var collectionExists = configurationSettingsStore.CollectionExists("ReallyStopDebugger");
 
                 if (collectionExists)
                 {
                     if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "CustomProcessList"))
                     {
-                        this.processCustomDisplayDataGrid.ItemsSource = (configurationSettingsStore.GetString("ReallyStopDebugger", "CustomProcessList") ?? string.Empty)
-                            .Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+                        this.processCustomDisplayDataGrid.ItemsSource =
+                            (configurationSettingsStore.GetString("ReallyStopDebugger", "CustomProcessList")
+                             ?? string.Empty).Split(new[] { "\r\n", "\n" }, StringSplitOptions.None).ToList();
                     }
 
                     if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ForceClean"))
                     {
-                        this.forceCleanCheckBox.IsChecked = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "ForceClean"));
+                        this.forceCleanCheckBox.IsChecked =
+                            Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "ForceClean"));
                     }
 
                     if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "UserProcessMatch"))
                     {
-                        this.userCriteriaRadioButton_userOnly.IsChecked = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "UserProcessMatch"));
+                        this.userCriteriaRadioButton_userOnly.IsChecked =
+                            Convert.ToBoolean(
+                                configurationSettingsStore.GetString("ReallyStopDebugger", "UserProcessMatch"));
                     }
 
                     if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ChildProcessMatch"))
                     {
-                        this.userCriteriaRadioButton_userOnly.IsChecked = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "ChildProcessMatch"));
+                        this.userCriteriaRadioButton_userOnly.IsChecked =
+                            Convert.ToBoolean(
+                                configurationSettingsStore.GetString("ReallyStopDebugger", "ChildProcessMatch"));
                     }
                 }
             }
@@ -182,6 +209,8 @@ namespace ReallyStopDebugger
 
         private void ReallyStopDebuggerConfig_Unloaded(object sender, RoutedEventArgs e)
         {
+            this.processDisplayDataGrid.ItemsSource = null;
+
             #region Save settings
 
             if (this.settingsManager != null)
@@ -194,13 +223,35 @@ namespace ReallyStopDebugger
                     userSettingsStore.CreateCollection("ReallyStopDebugger");
                 }
 
-                userSettingsStore.SetString("ReallyStopDebugger", "CustomProcessList", string.Join("\r\n", this.processCustomDisplayDataGrid.ItemsSource.Cast<string>()));
-                userSettingsStore.SetString("ReallyStopDebugger", "ForceClean", this.forceCleanCheckBox.IsChecked.GetValueOrDefault().ToString());
-                userSettingsStore.SetString("ReallyStopDebugger", "UserProcessMatch", this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
-                userSettingsStore.SetString("ReallyStopDebugger", "ChildProcessMatch", this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
+                userSettingsStore.SetString(
+                    "ReallyStopDebugger",
+                    "CustomProcessList",
+                    string.Join("\r\n", this.processCustomDisplayDataGrid.ItemsSource ?? new List<string>()));
+                userSettingsStore.SetString(
+                    "ReallyStopDebugger",
+                    "ForceClean",
+                    this.forceCleanCheckBox.IsChecked.GetValueOrDefault().ToString());
+                userSettingsStore.SetString(
+                    "ReallyStopDebugger",
+                    "UserProcessMatch",
+                    this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
+                userSettingsStore.SetString(
+                    "ReallyStopDebugger",
+                    "ChildProcessMatch",
+                    this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
             }
 
             #endregion
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private void RefreshProcessDisplayDataGrid()
+        {
+            this.processDisplayDataGrid.ItemsSource = null;
+            this.processDisplayDataGrid.ItemsSource = this.Processes;
         }
 
         #endregion

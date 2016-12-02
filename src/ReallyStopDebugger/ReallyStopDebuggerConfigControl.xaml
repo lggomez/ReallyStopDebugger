@@ -4,12 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vsui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.12.0"
+             xmlns:reallyStopDebugger="clr-namespace:ReallyStopDebugger"
              Background="{DynamicResource {x:Static SystemColors.WindowFrameColor}}"
              Foreground="{DynamicResource {x:Static SystemColors.WindowTextColor}}"
              mc:Ignorable="d"
              Height="530" MinHeight="530" 
              Width="510" MinWidth="510"
-             Name="MyToolWindow">
+             Name="MyToolWindow" d:DataContext="{d:DesignData }">
     <Grid Margin="5,5,5,5" Height="510" MinHeight="510">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="101*" />
@@ -70,7 +71,29 @@
                Content="Process criteria: " Grid.Column="2" HorizontalAlignment="Left" Height="24" Grid.Row="2" VerticalAlignment="Top" Width="140" Margin="0,59,-15,0"/>
         <DataGrid x:Name="processDisplayDataGrid" Margin="5,5,5,0" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                   VerticalAlignment="Top" Height="150" IsManipulationEnabled="False" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" 
-                  AlternatingRowBackground="Azure" SelectionMode="Extended" AutoGenerateColumns="True"/>
+                  AlternatingRowBackground="Azure" SelectionMode="Extended" AutoGenerateColumns="False" CanUserResizeRows="False"
+                  ItemsSource="{Binding Path=Processes, BindsDirectlyToSource=True, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type reallyStopDebugger:MyControl}}}">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Width="30">
+                    <DataGridTemplateColumn.Header>
+                        <DockPanel>
+                            <Border Name="border" Background="#BAFFFFFF">
+                                <CheckBox Checked="ProcessSelectionHeader_OnChecked" Unchecked="ProcessSelectionHeader_OnChecked"
+                                          IsChecked="{ Binding AllProcessesSelected, RelativeSource={RelativeSource AncestorType=reallyStopDebugger:MyControl }}"/>
+                            </Border>
+                        </DockPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Header="Name" Binding="{Binding ProcessName, Mode=OneWay}" />
+                <DataGridTextColumn Header="Count" Binding="{Binding ProcessCount, Mode=OneWay}"/>
+            </DataGrid.Columns>
+        </DataGrid>
 
         <Label Content="Enter custom process names to match:" 
                 Foreground="{DynamicResource ResourceKey={x:Static vsui:EnvironmentColors.SystemMenuTextBrushKey}}"

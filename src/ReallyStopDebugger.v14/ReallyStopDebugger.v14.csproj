@@ -183,7 +183,7 @@
       <Link>ReallyStopDebuggerConfigControl.xaml.cs</Link>
     </Compile>
     <Compile Include="Common\DTEHelpers.cs" />
-    <Compile Include="ProcessInfo.cs" />
+    <Compile Include="Common\ProcessInfo.cs" />
     <Compile Include="ReallyStopDebuggerToolWindow.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
