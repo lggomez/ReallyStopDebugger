@@ -152,36 +152,16 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\ReallyStopDebugger\Common\Constants.cs">
-      <Link>Common\Constants.cs</Link>
-    </Compile>
-    <Compile Include="..\ReallyStopDebugger\Common\FileUtils.cs">
-      <Link>Common\FileUtils.cs</Link>
-    </Compile>
-    <Compile Include="..\ReallyStopDebugger\Common\PackageExtensions.cs">
-      <Link>Common\PackageExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\ReallyStopDebugger\Common\ProcessHelper.cs">
-      <Link>Common\ProcessHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\ReallyStopDebugger\Common\WindowsInterop.cs">
-      <Link>Common\WindowsInterop.cs</Link>
-    </Compile>
-    <Compile Include="..\ReallyStopDebugger\GlobalSuppressions.cs">
-      <Link>GlobalSuppressions.cs</Link>
-    </Compile>
-    <Compile Include="..\ReallyStopDebugger\Guids.cs">
-      <Link>Guids.cs</Link>
-    </Compile>
-    <Compile Include="..\ReallyStopDebugger\PkgCmdID.cs">
-      <Link>PkgCmdID.cs</Link>
-    </Compile>
-    <Compile Include="..\ReallyStopDebugger\Properties\AssemblyInfo.cs">
-      <Link>Properties\AssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\ReallyStopDebugger\ReallyStopDebuggerConfigControl.xaml.cs">
-      <Link>ReallyStopDebuggerConfigControl.xaml.cs</Link>
-    </Compile>
+    <Compile Include="Common\Constants.cs" />
+    <Compile Include="Common\FileUtils.cs" />
+    <Compile Include="Common\PackageExtensions.cs" />
+    <Compile Include="Common\ProcessHelper.cs" />
+    <Compile Include="Common\WindowsInterop.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Guids.cs" />
+    <Compile Include="PkgCmdID.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReallyStopDebuggerConfigControl.xaml.cs" />
     <Compile Include="Common\ImageExtensions.cs" />
     <Compile Include="Common\DTEHelpers.cs" />
     <Compile Include="Common\ProcessInfo.cs" />
@@ -194,8 +174,8 @@
     <Compile Include="ReallyStopDebuggerPackage.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\ReallyStopDebugger\VSPackage.resx">
-      <Link>VSPackage.resx</Link>
+    <EmbeddedResource Include="VSPackage.resx">
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -205,29 +185,19 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <VSCTCompile Include="..\ReallyStopDebugger\ReallyStopDebugger.vsct">
+    <VSCTCompile Include="ReallyStopDebugger.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
       <SubType>Designer</SubType>
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ReallyStopDebugger\Key.snk">
-      <Link>Key.snk</Link>
-    </None>
+    <None Include="Key.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="..\ReallyStopDebugger\RELEASE.txt">
-      <Link>RELEASE.txt</Link>
-    </Resource>
-    <Resource Include="..\ReallyStopDebugger\Resources\Images.png">
-      <Link>Resources\Images.png</Link>
-    </Resource>
-    <Resource Include="..\ReallyStopDebugger\Resources\Package.ico">
-      <Link>Resources\Package.ico</Link>
-    </Resource>
-    <None Include="..\ReallyStopDebugger\source.extension.vsixmanifest">
-      <Link>source.extension.vsixmanifest</Link>
-    </None>
+    <Resource Include="RELEASE.txt" />
+    <Resource Include="Resources\Images.png" />
+    <Resource Include="Resources\Package.ico" />
+    <None Include="source.extension.vsixmanifest" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
@@ -242,15 +212,13 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="..\ReallyStopDebugger\ReallyStopDebuggerConfigControl.xaml">
-      <Link>ReallyStopDebuggerConfigControl.xaml</Link>
+    <Page Include="ReallyStopDebuggerConfigControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\ReallyStopDebugger\LICENSE.txt">
-      <Link>LICENSE.txt</Link>
+    <Content Include="LICENSE.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
