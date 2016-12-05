@@ -1,12 +1,22 @@
-﻿using System.Diagnostics;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Drawing;
+using System.Windows.Forms;
+using System.Windows.Media.Imaging;
 
-namespace ReallyStopDebugger
+namespace ReallyStopDebugger.Common
 {
     public class ProcessInfo
     {
         private readonly Process originProcess;
+
+        private readonly BitmapSource defaultProcessIcon =
+            ((Icon)
+                typeof(Form).GetProperty(
+                        "DefaultIcon",
+                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                    .GetValue(null, null)).ToBitmapSource();
 
         public int Id
         {
@@ -16,7 +26,19 @@ namespace ReallyStopDebugger
             }
         }
 
-        public string Domain { get; }
+        private BitmapSource executableIcon;
+
+        public BitmapSource ExecutableIcon
+        {
+            get
+            {
+                return this.executableIcon;
+            }
+            private set
+            {
+                this.executableIcon = value ?? this.defaultProcessIcon;
+            }
+        }
 
         public string ProcessName
         {
@@ -26,11 +48,21 @@ namespace ReallyStopDebugger
             }
         }
 
-        public string FileName { get; }
+        public string FilePath
+        {
+            get
+            {
+                return ProcessHelper.GetProcessPath(this.originProcess);
+            }
+        }
 
-        public string UserName { get; }
-
-        public string WorkingDirectory { get; }
+        public string UserName
+        {
+            get
+            {
+                return this.originProcess.MainModule.FileName;
+            }
+        }
 
         public int ProcessCount { get; }
 
@@ -40,6 +72,7 @@ namespace ReallyStopDebugger
         {
             this.originProcess = processes.First();
             this.ProcessCount = processes.Count();
+            this.ExecutableIcon = ProcessHelper.GetProcessIcon(this.originProcess)?.ToBitmapSource();
         }
     }
 }

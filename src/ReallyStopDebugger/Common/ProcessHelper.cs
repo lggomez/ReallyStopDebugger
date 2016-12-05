@@ -2,44 +2,50 @@
 // Licensed under the MIT license. See LICENSE file in the src\ReallyStopDebugger directory for full license information.
 
 using Microsoft.VisualStudio.Shell;
+
 using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Linq;
+using System.Drawing;
+
 using Process = System.Diagnostics.Process;
 
 namespace ReallyStopDebugger.Common
 {
     internal static class ProcessHelper
     {
-        public static int KillProcesses(Package package, IList processNames, bool restrictUser, bool restrictChildren, bool consoleMode = false)
+        public static int KillProcesses(
+            Package package,
+            IList processNames,
+            bool restrictUser,
+            bool restrictChildren,
+            bool consoleMode = false)
         {
             string currentProcessName = string.Empty;
 
             try
             {
-                var runningProcesses = restrictUser ? 
-                                            WindowsInterop.GetCurrentUserProcesses() : 
-                                            Process.GetProcesses().ToList();
+                var runningProcesses = restrictUser
+                                           ? WindowsInterop.GetCurrentUserProcesses()
+                                           : Process.GetProcesses().ToList();
 
-                var filteredProcesses = runningProcesses
-                    .Join(processNames.Cast<string>(),
+                var filteredProcesses =
+                    runningProcesses.Join(
+                        processNames.Cast<string>(),
                         p => (p.ProcessName).ToLower(),
                         n => (n ?? string.Empty).ToLower(),
-                        (p, n) => p)
-                    .ToList();
+                        (p, n) => p).ToList();
 
                 if (restrictChildren)
                 {
                     var childProcesses = WindowsInterop.GetChildProcesses(WindowsInterop.GetCurrentProcess().Id);
 
-                    filteredProcesses = (from p in filteredProcesses
-                                         join c in childProcesses on p.Id equals c.Id
-                                         select p).ToList();
+                    filteredProcesses =
+                        (from p in filteredProcesses join c in childProcesses on p.Id equals c.Id select p).ToList();
                 }
 
-                if (!filteredProcesses.Any())
-                    return Constants.PROCESSESNOTFOUND;
+                if (!filteredProcesses.Any()) return Constants.PROCESSESNOTFOUND;
 
                 foreach (var p in filteredProcesses)
                 {
@@ -51,7 +57,9 @@ namespace ReallyStopDebugger.Common
             {
                 if (!consoleMode)
                 {
-                    package.ShowErrorMessage("The associated process could not be terminated, is terminating or is an invalid Win32 process.", "Error killing process: " + currentProcessName);
+                    package.ShowErrorMessage(
+                        "The associated process could not be terminated, is terminating or is an invalid Win32 process.",
+                        "Error killing process: " + currentProcessName);
                 }
                 return Constants.PROCESSESKILLERROR;
             }
@@ -59,7 +67,9 @@ namespace ReallyStopDebugger.Common
             {
                 if (!consoleMode)
                 {
-                    package.ShowErrorMessage("Cannot kill a process running on a remote computer. Aborting.", "Error killing process: " + currentProcessName);
+                    package.ShowErrorMessage(
+                        "Cannot kill a process running on a remote computer. Aborting.",
+                        "Error killing process: " + currentProcessName);
                 }
                 return Constants.PROCESSESKILLERROR;
             }
@@ -67,7 +77,9 @@ namespace ReallyStopDebugger.Common
             {
                 if (!consoleMode)
                 {
-                    package.ShowErrorMessage("The process has already exited or was not found.", "Error killing process: " + currentProcessName);
+                    package.ShowErrorMessage(
+                        "The process has already exited or was not found.",
+                        "Error killing process: " + currentProcessName);
                 }
                 return Constants.PROCESSESKILLERROR;
             }
@@ -75,12 +87,36 @@ namespace ReallyStopDebugger.Common
             {
                 if (!consoleMode)
                 {
-                    package.ShowErrorMessage(string.Format("An exception has occurred: " + ex.Message), "Error killing process: " + currentProcessName);
+                    package.ShowErrorMessage(
+                        string.Format("An exception has occurred: " + ex.Message),
+                        "Error killing process: " + currentProcessName);
                 }
                 return Constants.PROCESSESKILLERROR;
             }
 
             return Constants.PROCESSESKILLSUCCESS;
+        }
+
+        public static string GetProcessPath(Process process)
+        {
+            return WindowsInterop.GetProcessPath(process.Id);
+        }
+
+        public static string GetProcessFileName(Process process)
+        {
+            return WindowsInterop.GetProcessFileName(process.Id);
+        }
+
+        public static Icon GetProcessIcon(Process process)
+        {
+            try
+            {
+                return Icon.ExtractAssociatedIcon(GetProcessPath(process));
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
     }
 }

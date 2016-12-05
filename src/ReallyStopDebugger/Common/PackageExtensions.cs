@@ -9,6 +9,9 @@ namespace ReallyStopDebugger.Common
 {
     internal static class PackageExtensions
     {
+        /// <summary>
+        /// Shows an error message using the VsShellUtilities helper.
+        /// </summary>
         public static void ShowErrorMessage(this Package package, string message, string title)
         {
             ErrorHandler.ThrowOnFailure(VsShellUtilities.ShowMessageBox(
@@ -20,6 +23,9 @@ namespace ReallyStopDebugger.Common
                 OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST));
         }
 
+        /// <summary>
+        /// Shows an informational message using the VsShellUtilities helper.
+        /// </summary>
         public static void ShowInfoMessage(this Package package, string message, string title)
         {
             ErrorHandler.ThrowOnFailure(VsShellUtilities.ShowMessageBox(
