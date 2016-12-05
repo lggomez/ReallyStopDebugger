@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
-namespace ReallyStopDebugger.Common
+namespace ReallyStopDebugger.Native
 {
     public static class ImageExtensions
     {

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
+using ReallyStopDebugger.Native;
 
 namespace ReallyStopDebugger.Common
 {

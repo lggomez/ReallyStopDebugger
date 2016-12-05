@@ -12,7 +12,7 @@ using System.Security;
 using System.Security.Principal;
 using System.Text;
 
-namespace ReallyStopDebugger.Common
+namespace ReallyStopDebugger.Native
 {
     internal static class WindowsInterop
     {

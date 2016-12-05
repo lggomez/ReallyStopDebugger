@@ -1,15 +1,16 @@
 ﻿// Copyright (c) Luis Gómez. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the src\ReallyStopDebugger directory for full license information.
 
-using Microsoft.VisualStudio.Shell;
-
 using System;
 using System.Collections;
 using System.ComponentModel;
-using System.Linq;
+using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 
-using Process = System.Diagnostics.Process;
+using Microsoft.VisualStudio.Shell;
+
+using ReallyStopDebugger.Native;
 
 namespace ReallyStopDebugger.Common
 {
@@ -33,7 +34,7 @@ namespace ReallyStopDebugger.Common
                 var filteredProcesses =
                     runningProcesses.Join(
                         processNames.Cast<string>(),
-                        p => (p.ProcessName).ToLower(),
+                        p => p.ProcessName.ToLower(),
                         n => (n ?? string.Empty).ToLower(),
                         (p, n) => p).ToList();
 

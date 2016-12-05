@@ -5,7 +5,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace ReallyStopDebugger.Common
+namespace ReallyStopDebugger.Native
 {
     internal static class PackageExtensions
     {

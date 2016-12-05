@@ -13,6 +13,7 @@ using System.ComponentModel.Design;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
+using ReallyStopDebugger.Native;
 
 namespace ReallyStopDebugger
 {

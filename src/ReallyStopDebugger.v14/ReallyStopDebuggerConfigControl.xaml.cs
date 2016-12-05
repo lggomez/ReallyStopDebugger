@@ -7,10 +7,10 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 
 using ReallyStopDebugger.Common;
+using ReallyStopDebugger.Native;
 
 using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
