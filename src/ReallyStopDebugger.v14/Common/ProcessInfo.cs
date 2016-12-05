@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) Luis Gómez. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the src\ReallyStopDebugger directory for full license information.
+
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Drawing;
@@ -18,13 +21,7 @@ namespace ReallyStopDebugger.Common
                         System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
                     .GetValue(null, null)).ToBitmapSource();
 
-        public int Id
-        {
-            get
-            {
-                return this.originProcess.Id;
-            }
-        }
+        public int Id => this.originProcess.Id;
 
         private BitmapSource executableIcon;
 
@@ -40,29 +37,11 @@ namespace ReallyStopDebugger.Common
             }
         }
 
-        public string ProcessName
-        {
-            get
-            {
-                return this.originProcess.ProcessName;
-            }
-        }
+        public string ProcessName => this.originProcess.ProcessName;
 
-        public string FilePath
-        {
-            get
-            {
-                return ProcessHelper.GetProcessPath(this.originProcess);
-            }
-        }
+        public string FilePath => ProcessHelper.GetProcessPath(this.originProcess);
 
-        public string UserName
-        {
-            get
-            {
-                return this.originProcess.MainModule.FileName;
-            }
-        }
+        public string UserName => this.originProcess.MainModule.FileName;
 
         public int ProcessCount { get; }
 

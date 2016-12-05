@@ -22,7 +22,7 @@ namespace ReallyStopDebugger.Common
             bool restrictChildren,
             bool consoleMode = false)
         {
-            string currentProcessName = string.Empty;
+            var currentProcessName = string.Empty;
 
             try
             {
@@ -45,7 +45,7 @@ namespace ReallyStopDebugger.Common
                         (from p in filteredProcesses join c in childProcesses on p.Id equals c.Id select p).ToList();
                 }
 
-                if (!filteredProcesses.Any()) return Constants.PROCESSESNOTFOUND;
+                if (!filteredProcesses.Any()) return Constants.Processesnotfound;
 
                 foreach (var p in filteredProcesses)
                 {
@@ -61,7 +61,7 @@ namespace ReallyStopDebugger.Common
                         "The associated process could not be terminated, is terminating or is an invalid Win32 process.",
                         "Error killing process: " + currentProcessName);
                 }
-                return Constants.PROCESSESKILLERROR;
+                return Constants.Processeskillerror;
             }
             catch (NotSupportedException)
             {
@@ -71,7 +71,7 @@ namespace ReallyStopDebugger.Common
                         "Cannot kill a process running on a remote computer. Aborting.",
                         "Error killing process: " + currentProcessName);
                 }
-                return Constants.PROCESSESKILLERROR;
+                return Constants.Processeskillerror;
             }
             catch (InvalidOperationException)
             {
@@ -81,7 +81,7 @@ namespace ReallyStopDebugger.Common
                         "The process has already exited or was not found.",
                         "Error killing process: " + currentProcessName);
                 }
-                return Constants.PROCESSESKILLERROR;
+                return Constants.Processeskillerror;
             }
             catch (Exception ex)
             {
@@ -91,10 +91,10 @@ namespace ReallyStopDebugger.Common
                         string.Format("An exception has occurred: " + ex.Message),
                         "Error killing process: " + currentProcessName);
                 }
-                return Constants.PROCESSESKILLERROR;
+                return Constants.Processeskillerror;
             }
 
-            return Constants.PROCESSESKILLSUCCESS;
+            return Constants.Processeskillsuccess;
         }
 
         public static string GetProcessPath(Process process)

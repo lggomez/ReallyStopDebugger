@@ -19,7 +19,7 @@ namespace ReallyStopDebugger
     [Guid(GuidList.guidToolWindowPersistanceString)]
     public sealed class ReallyStopDebuggerToolWindow : ToolWindowPane
     {
-        internal Package currentPackage { get; set; }
+        internal Package CurrentPackage { get; set; }
 
         /// <summary>
         /// Standard constructor for the tool window.

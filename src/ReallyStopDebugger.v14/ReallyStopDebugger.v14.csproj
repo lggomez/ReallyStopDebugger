@@ -153,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\Constants.cs" />
+    <Compile Include="Common\CustomProcessInfo.cs" />
     <Compile Include="Common\FileUtils.cs" />
     <Compile Include="Common\PackageExtensions.cs" />
     <Compile Include="Common\ProcessHelper.cs" />

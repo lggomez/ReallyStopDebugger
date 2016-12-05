@@ -19,7 +19,7 @@ namespace ReallyStopDebugger.Common
         #region Marshalling structs & consts
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-        public struct PROCESSENTRY32
+        public struct Processentry32
         {
             public uint dwSize;
 
@@ -94,34 +94,34 @@ namespace ReallyStopDebugger.Common
         }
 
         // Token security access
-        public const uint STANDARD_RIGHTS_REQUIRED = 0x000F0000;
+        public const uint StandardRightsRequired = 0x000F0000;
 
-        public const uint STANDARD_RIGHTS_READ = 0x00020000;
+        public const uint StandardRightsRead = 0x00020000;
 
-        public const uint TOKEN_ASSIGN_PRIMARY = 0x0001;
+        public const uint TokenAssignPrimary = 0x0001;
 
-        public const uint TOKEN_DUPLICATE = 0x0002;
+        public const uint TokenDuplicate = 0x0002;
 
-        public const uint TOKEN_IMPERSONATE = 0x0004;
+        public const uint TokenImpersonate = 0x0004;
 
-        public const uint TOKEN_QUERY = 0x0008;
+        public const uint TokenQuery = 0x0008;
 
-        public const uint TOKEN_QUERY_SOURCE = 0x0010;
+        public const uint TokenQuerySource = 0x0010;
 
-        public const uint TOKEN_ADJUST_PRIVILEGES = 0x0020;
+        public const uint TokenAdjustPrivileges = 0x0020;
 
-        public const uint TOKEN_ADJUST_GROUPS = 0x0040;
+        public const uint TokenAdjustGroups = 0x0040;
 
-        public const uint TOKEN_ADJUST_DEFAULT = 0x0080;
+        public const uint TokenAdjustDefault = 0x0080;
 
-        public const uint TOKEN_ADJUST_SESSIONID = 0x0100;
+        public const uint TokenAdjustSessionid = 0x0100;
 
-        public const uint TOKEN_READ = (STANDARD_RIGHTS_READ | TOKEN_QUERY);
+        public const uint TokenRead = (StandardRightsRead | TokenQuery);
 
-        public const uint TOKEN_ALL_ACCESS =
-            (STANDARD_RIGHTS_REQUIRED | TOKEN_ASSIGN_PRIMARY | TOKEN_DUPLICATE | TOKEN_IMPERSONATE | TOKEN_QUERY
-             | TOKEN_QUERY_SOURCE | TOKEN_ADJUST_PRIVILEGES | TOKEN_ADJUST_GROUPS | TOKEN_ADJUST_DEFAULT
-             | TOKEN_ADJUST_SESSIONID);
+        public const uint TokenAllAccess =
+            (StandardRightsRequired | TokenAssignPrimary | TokenDuplicate | TokenImpersonate | TokenQuery
+             | TokenQuerySource | TokenAdjustPrivileges | TokenAdjustGroups | TokenAdjustDefault
+             | TokenAdjustSessionid);
 
         public enum TOKEN_INFORMATION_CLASS
         {
@@ -150,13 +150,13 @@ namespace ReallyStopDebugger.Common
             TokenSessionId
         }
 
-        public struct TOKEN_USER
+        public struct TokenUser
         {
-            public SID_AND_ATTRIBUTES User;
+            public SidAndAttributes User;
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct SID_AND_ATTRIBUTES
+        public struct SidAndAttributes
         {
             public IntPtr Sid;
 
@@ -195,10 +195,10 @@ namespace ReallyStopDebugger.Common
         static extern IntPtr CreateToolhelp32Snapshot([In] uint dwFlags, [In] uint th32ProcessId);
 
         [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Ansi)]
-        static extern bool Process32First([In] IntPtr hSnapshot, ref PROCESSENTRY32 lppe);
+        static extern bool Process32First([In] IntPtr hSnapshot, ref Processentry32 lppe);
 
         [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Ansi)]
-        static extern bool Process32Next([In] IntPtr hSnapshot, ref PROCESSENTRY32 lppe);
+        static extern bool Process32Next([In] IntPtr hSnapshot, ref Processentry32 lppe);
 
         [DllImport("advapi32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -227,16 +227,6 @@ namespace ReallyStopDebugger.Common
             [Out] StringBuilder lpBaseName,
             [In] [MarshalAs(UnmanagedType.U4)] int nSize);
 
-        [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        static extern bool LookupAccountSid(
-            string lpSystemName,
-            [MarshalAs(UnmanagedType.LPArray)] byte[] Sid,
-            StringBuilder lpName,
-            ref uint cchName,
-            StringBuilder ReferencedDomainName,
-            ref uint cchReferencedDomainName,
-            out SID_NAME_USE peUse);
-
         [DllImport("gdi32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool DeleteObject(IntPtr hObject);
@@ -260,8 +250,8 @@ namespace ReallyStopDebugger.Common
 
             try
             {
-                var targetSize = (uint)Marshal.SizeOf(typeof(PROCESSENTRY32));
-                var processEntry = new PROCESSENTRY32 { dwSize = targetSize };
+                var targetSize = (uint)Marshal.SizeOf(typeof(Processentry32));
+                var processEntry = new Processentry32 { dwSize = targetSize };
                 snapshotHandle = CreateToolhelp32Snapshot((uint)SnapshotFlags.Process, 0);
 
                 if (Process32First(snapshotHandle, ref processEntry))
@@ -288,17 +278,17 @@ namespace ReallyStopDebugger.Common
             return childProcesses;
         }
 
-        public static bool GetProcessUser(IntPtr processHandle, out string userSID)
+        public static bool GetProcessUser(IntPtr processHandle, out string userSid)
         {
-            userSID = null;
+            userSid = null;
 
             try
             {
                 IntPtr processToken;
 
-                if (OpenProcessToken(processHandle, TOKEN_QUERY, out processToken))
+                if (OpenProcessToken(processHandle, TokenQuery, out processToken))
                 {
-                    GetUserSidFromProcessToken(processToken, out userSID);
+                    GetUserSidFromProcessToken(processToken, out userSid);
                     CloseHandle(processToken);
                 }
 
@@ -310,11 +300,11 @@ namespace ReallyStopDebugger.Common
             }
         }
 
-        private static bool GetUserSidFromProcessToken(IntPtr processToken, out string userSID)
+        private static bool GetUserSidFromProcessToken(IntPtr processToken, out string userSid)
         {
             const int BufLength = 256;
             var tokenInformation = Marshal.AllocHGlobal(BufLength);
-            userSID = null;
+            userSid = null;
 
             try
             {
@@ -328,8 +318,8 @@ namespace ReallyStopDebugger.Common
 
                 if (ret)
                 {
-                    var tokenUser = (TOKEN_USER)Marshal.PtrToStructure(tokenInformation, typeof(TOKEN_USER));
-                    ConvertSidToStringSid(tokenUser.User.Sid, ref userSID);
+                    var tokenUser = (TokenUser)Marshal.PtrToStructure(tokenInformation, typeof(TokenUser));
+                    ConvertSidToStringSid(tokenUser.User.Sid, ref userSid);
                 }
 
                 return ret;
@@ -344,18 +334,18 @@ namespace ReallyStopDebugger.Common
             }
         }
 
-        public static List<KeyValuePair<Process, string>> GetCurrentProcessesWIthUserSIDs()
+        public static List<KeyValuePair<Process, string>> GetCurrentProcessesWIthUserSiDs()
         {
             var runningProcesses = Process.GetProcesses();
             var result = new List<KeyValuePair<Process, string>>();
 
-            foreach (Process process in runningProcesses)
+            foreach (var process in runningProcesses)
             {
-                string userSID = null;
+                string userSid = null;
 
                 try
                 {
-                    GetProcessUser(process.Handle, out userSID);
+                    GetProcessUser(process.Handle, out userSid);
                 }
                 catch (Exception ex)
                 {
@@ -364,9 +354,9 @@ namespace ReallyStopDebugger.Common
                     if (ex is InvalidOperationException || ex is Win32Exception) continue;
                 }
 
-                if (userSID != null)
+                if (userSid != null)
                 {
-                    result.Add(new KeyValuePair<Process, string>(process, userSID));
+                    result.Add(new KeyValuePair<Process, string>(process, userSid));
                 }
             }
 
@@ -394,18 +384,18 @@ namespace ReallyStopDebugger.Common
 
         public static List<Process> GetCurrentUserProcesses()
         {
-            var runningProcesses = GetCurrentProcessesWIthUserSIDs();
-            var userSID = GetCurrentUserSid();
+            var runningProcesses = GetCurrentProcessesWIthUserSiDs();
+            var userSid = GetCurrentUserSid();
 
             return
-                runningProcesses.Where(kv => kv.Value.Equals(userSID, StringComparison.InvariantCultureIgnoreCase))
+                runningProcesses.Where(kv => kv.Value.Equals(userSid, StringComparison.InvariantCultureIgnoreCase))
                     .Select(kv => kv.Key)
                     .ToList();
         }
 
         public static string GetProcessPath(int processId)
         {
-            string result = "N/A";
+            var result = "N/A";
 
             var processHandle = OpenProcess(
                 ProcessAccessFlags.VirtualMemoryRead | ProcessAccessFlags.QueryInformation,
@@ -417,10 +407,10 @@ namespace ReallyStopDebugger.Common
                 return result;
             }
 
-            var size = 1024;
-            var baseNameBuilder = new StringBuilder(size);
+            const int Size = 1024;
+            var baseNameBuilder = new StringBuilder(Size);
             
-            if (GetModuleFileNameEx(processHandle, IntPtr.Zero, baseNameBuilder, size) > 0)
+            if (GetModuleFileNameEx(processHandle, IntPtr.Zero, baseNameBuilder, Size) > 0)
             {
                 result = baseNameBuilder.ToString();
             }
@@ -432,7 +422,7 @@ namespace ReallyStopDebugger.Common
 
         public static string GetProcessFileName(int processId)
         {
-            string processPath = GetProcessPath(processId);
+            var processPath = GetProcessPath(processId);
 
             return processPath.Equals("N/A") ? processPath : Path.GetFileName(processPath);
         }

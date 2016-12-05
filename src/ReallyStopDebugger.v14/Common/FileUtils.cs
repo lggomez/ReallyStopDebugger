@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Luis Gómez. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the src\ReallyStopDebugger directory for full license information.
+
+using System;
 using System.IO;
 
 namespace ReallyStopDebugger.Common
@@ -9,17 +12,17 @@ namespace ReallyStopDebugger.Common
         {
             try
             {
-                string solutionDirectory = Path.GetDirectoryName(dte.Solution.FullName);
+                var solutionDirectory = Path.GetDirectoryName(dte.Solution.FullName);
 
                 var binTargets = Directory.GetDirectories(solutionDirectory, "bin", SearchOption.AllDirectories);
                 var objTargets = Directory.GetDirectories(solutionDirectory, "obj", SearchOption.AllDirectories);
 
-                foreach (string target in binTargets)
+                foreach (var target in binTargets)
                 {
                     ForceDeleteDirectory(target, "bin");
                 }
 
-                foreach (string target in objTargets)
+                foreach (var target in objTargets)
                 {
                     ForceDeleteDirectory(target, "obj");
                 }

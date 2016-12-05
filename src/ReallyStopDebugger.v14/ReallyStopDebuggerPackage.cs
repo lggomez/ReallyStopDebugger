@@ -65,19 +65,19 @@ namespace ReallyStopDebugger
             // Get the instance number 0 of this tool window. This window is single instance so this instance
             // is actually the only one.
             // The last flag is set to true so that if the tool window does not exist it will be created.
-            ReallyStopDebuggerToolWindow window = this.FindToolWindow(typeof(ReallyStopDebuggerToolWindow), 0, true) as ReallyStopDebuggerToolWindow;
+            var window = this.FindToolWindow(typeof(ReallyStopDebuggerToolWindow), 0, true) as ReallyStopDebuggerToolWindow;
 
             if ((null == window) || (null == window.Frame))
             {
                 throw new NotSupportedException(Resources.CanNotCreateWindow);
             }
 
-            window.currentPackage = this;
+            window.CurrentPackage = this;
 
-            IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
+            var windowFrame = (IVsWindowFrame)window.Frame;
 
-            ((MyControl)window.Content).currentPackage = this;
-            ((MyControl)window.Content).settingsManager = new ShellSettingsManager(this);
+            ((MyControl)window.Content).CurrentPackage = this;
+            ((MyControl)window.Content).SettingsManager = new ShellSettingsManager(this);
 
             ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
@@ -95,29 +95,29 @@ namespace ReallyStopDebugger
             base.Initialize();
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
-            OleMenuCommandService mcs = this.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+            var mcs = this.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
 
             if (null != mcs)
             {
                 // Create the command for the cfg menu item.
-                CommandID menuCommandID = new CommandID(
+                var menuCommandID = new CommandID(
                                               GuidList.guidReallyStopDebuggerCmdSet,
                                               (int)PkgCmdIDList.cmdidReallyStopDebugger);
-                MenuCommand menuItem = new MenuCommand(this.MenuItemCallback, menuCommandID);
+                var menuItem = new MenuCommand(this.MenuItemCallback, menuCommandID);
                 mcs.AddCommand(menuItem);
 
                 // Create the command for the lite version menu item.
-                CommandID menuCommandID2 = new CommandID(
+                var menuCommandID2 = new CommandID(
                                                GuidList.guidReallyStopDebuggerCmdSet,
                                                (int)PkgCmdIDList.cmdidReallyStopDebuggerLite);
-                MenuCommand menuItem2 = new MenuCommand(this.MenuItemCallbackLite, menuCommandID2);
+                var menuItem2 = new MenuCommand(this.MenuItemCallbackLite, menuCommandID2);
                 mcs.AddCommand(menuItem2);
 
                 // Create the command for the tool window
-                CommandID toolwndCommandID = new CommandID(
+                var toolwndCommandID = new CommandID(
                                                  GuidList.guidReallyStopDebuggerCmdSet,
                                                  (int)PkgCmdIDList.cmdidReallyStopDebuggerCfg);
-                MenuCommand menuToolWin = new MenuCommand(this.ShowToolWindow, toolwndCommandID);
+                var menuToolWin = new MenuCommand(this.ShowToolWindow, toolwndCommandID);
                 mcs.AddCommand(menuToolWin);
             }
         }
@@ -173,8 +173,8 @@ namespace ReallyStopDebugger
                 // Default values. These may be overriden upon configuration store retrieval
                 var filter = new string[] { "MSBuild", "WebDev.WebServer40", "Microsoft.VisualStudio.Web.Host" };
 
-                SettingsStore configurationSettingsStore = (new ShellSettingsManager(this)).GetReadOnlySettingsStore(SettingsScope.UserSettings);
-                bool collectionExists = configurationSettingsStore.CollectionExists("ReallyStopDebugger");
+                var configurationSettingsStore = (new ShellSettingsManager(this)).GetReadOnlySettingsStore(SettingsScope.UserSettings);
+                var collectionExists = configurationSettingsStore.CollectionExists("ReallyStopDebugger");
 
                 if (collectionExists)
                 {
@@ -224,19 +224,19 @@ namespace ReallyStopDebugger
                 string returnMessage;
 
                 // Find the output window.
-                Window window = this.GetDte().Windows.Item(Constants.vsWindowKindOutput);
-                OutputWindow outputWindow = (OutputWindow)window.Object;
+                var window = this.GetDte().Windows.Item(Constants.vsWindowKindOutput);
+                var outputWindow = (OutputWindow)window.Object;
 
-                OutputWindowPane owp = outputWindow.OutputWindowPanes.Add("Output");
+                var owp = outputWindow.OutputWindowPanes.Add("Output");
 
                 switch (result)
                 {
-                    case Common.Constants.PROCESSESKILLSUCCESS:
+                    case Common.Constants.Processeskillsuccess:
                         {
                             returnMessage = "ReallyStopDebugger>------ Processes killed.";
                             break;
                         }
-                    case Common.Constants.PROCESSESNOTFOUND:
+                    case Common.Constants.Processesnotfound:
                         {
                             returnMessage = "ReallyStopDebugger>------ Could not find any matching processes.";
                             break;
