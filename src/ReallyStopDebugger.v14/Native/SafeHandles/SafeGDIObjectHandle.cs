@@ -20,7 +20,7 @@ namespace ReallyStopDebugger.Native.SafeHandles
         [System.Security.SecurityCritical]
         protected override bool ReleaseHandle()
         {
-            return WindowsInterop.DeleteObject(this.handle);
+            return WindowsNative.DeleteObject(this.handle);
         }
     }
 }

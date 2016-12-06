@@ -24,7 +24,7 @@ namespace ReallyStopDebugger.Native.SafeHandles
         protected override bool ReleaseHandle()
         {
             // Marshal.FreeHGlobal wraps LocalFree, so we use the direct call to validate
-            return WindowsInterop.LocalFree(this.handle) == IntPtr.Zero;
+            return WindowsNative.LocalFree(this.handle) == IntPtr.Zero;
         }
     }
 }

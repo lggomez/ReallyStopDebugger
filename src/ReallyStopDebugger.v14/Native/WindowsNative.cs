@@ -12,14 +12,16 @@ using System.Security;
 using System.Security.Principal;
 using System.Text;
 
+using Microsoft.Win32.SafeHandles;
+
 namespace ReallyStopDebugger.Native
 {
-    internal static class WindowsInterop
+    internal static class WindowsNative
     {
         #region Marshalling structs & consts
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-        public struct Processentry32
+        internal struct Processentry32
         {
             public uint dwSize;
 
@@ -44,7 +46,7 @@ namespace ReallyStopDebugger.Native
         };
 
         [Flags]
-        public enum ProcessAccessFlags : uint
+        internal enum ProcessAccessFlags : uint
         {
             All = 0x001F0FFF,
 
@@ -74,7 +76,7 @@ namespace ReallyStopDebugger.Native
         }
 
         [Flags]
-        private enum SnapshotFlags : uint
+        internal enum SnapshotFlags : uint
         {
             HeapList = 0x00000001,
 
@@ -93,37 +95,37 @@ namespace ReallyStopDebugger.Native
             NoH
         }
 
-        // Token security access
-        public const uint StandardRightsRequired = 0x000F0000;
+        #region Token security access
+        internal const uint StandardRightsRequired = 0x000F0000;
 
-        public const uint StandardRightsRead = 0x00020000;
+        internal const uint StandardRightsRead = 0x00020000;
 
-        public const uint TokenAssignPrimary = 0x0001;
+        internal const uint TokenAssignPrimary = 0x0001;
 
-        public const uint TokenDuplicate = 0x0002;
+        internal const uint TokenDuplicate = 0x0002;
 
-        public const uint TokenImpersonate = 0x0004;
+        internal const uint TokenImpersonate = 0x0004;
 
-        public const uint TokenQuery = 0x0008;
+        internal const uint TokenQuery = 0x0008;
 
-        public const uint TokenQuerySource = 0x0010;
+        internal const uint TokenQuerySource = 0x0010;
 
-        public const uint TokenAdjustPrivileges = 0x0020;
+        internal const uint TokenAdjustPrivileges = 0x0020;
 
-        public const uint TokenAdjustGroups = 0x0040;
+        internal const uint TokenAdjustGroups = 0x0040;
 
-        public const uint TokenAdjustDefault = 0x0080;
+        internal const uint TokenAdjustDefault = 0x0080;
 
-        public const uint TokenAdjustSessionid = 0x0100;
+        internal const uint TokenAdjustSessionid = 0x0100;
 
-        public const uint TokenRead = (StandardRightsRead | TokenQuery);
+        internal const uint TokenRead = StandardRightsRead | TokenQuery;
 
-        public const uint TokenAllAccess =
-            (StandardRightsRequired | TokenAssignPrimary | TokenDuplicate | TokenImpersonate | TokenQuery
-             | TokenQuerySource | TokenAdjustPrivileges | TokenAdjustGroups | TokenAdjustDefault
-             | TokenAdjustSessionid);
+        internal const uint TokenAllAccess =
+            StandardRightsRequired | TokenAssignPrimary | TokenDuplicate | TokenImpersonate | TokenQuery
+            | TokenQuerySource | TokenAdjustPrivileges | TokenAdjustGroups | TokenAdjustDefault | TokenAdjustSessionid; 
+        #endregion
 
-        public enum TOKEN_INFORMATION_CLASS
+        internal enum TOKEN_INFORMATION_CLASS
         {
             TokenUser = 1,
 
@@ -150,20 +152,20 @@ namespace ReallyStopDebugger.Native
             TokenSessionId
         }
 
-        public struct TokenUser
+        internal struct TokenUser
         {
             public SidAndAttributes User;
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct SidAndAttributes
+        internal struct SidAndAttributes
         {
             public IntPtr Sid;
 
             public int Attributes;
         }
 
-        public enum SID_NAME_USE
+        internal enum SID_NAME_USE
         {
             SidTypeUser = 1,
 
@@ -183,6 +185,118 @@ namespace ReallyStopDebugger.Native
 
             SidTypeComputer
         }
+
+        [Flags]
+        internal enum FileAccess : uint
+        {
+            AccessSystemSecurity = 0x1000000, // AccessSystemAcl access type
+
+            MaximumAllowed = 0x2000000, // MaximumAllowed access type
+
+            Delete = 0x10000,
+
+            ReadControl = 0x20000,
+
+            WriteDAC = 0x40000,
+
+            WriteOwner = 0x80000,
+
+            Synchronize = 0x100000,
+
+            StandardRightsRequired = 0xF0000,
+
+            StandardRightsRead = ReadControl,
+
+            StandardRightsWrite = ReadControl,
+
+            StandardRightsExecute = ReadControl,
+
+            StandardRightsAll = 0x1F0000,
+
+            SpecificRightsAll = 0xFFFF,
+
+            FILE_READ_DATA = 0x0001, // file & pipe
+
+            FILE_LIST_DIRECTORY = 0x0001, // directory
+
+            FILE_WRITE_DATA = 0x0002, // file & pipe
+
+            FILE_ADD_FILE = 0x0002, // directory
+
+            FILE_APPEND_DATA = 0x0004, // file
+
+            FILE_ADD_SUBDIRECTORY = 0x0004, // directory
+
+            FILE_CREATE_PIPE_INSTANCE = 0x0004, // named pipe
+
+            FILE_READ_EA = 0x0008, // file & directory
+
+            FILE_WRITE_EA = 0x0010, // file & directory
+
+            FILE_EXECUTE = 0x0020, // file
+
+            FILE_TRAVERSE = 0x0020, // directory
+
+            FILE_DELETE_CHILD = 0x0040, // directory
+
+            FILE_READ_ATTRIBUTES = 0x0080, // all
+
+            FILE_WRITE_ATTRIBUTES = 0x0100, // all
+
+            GenericRead = 0x80000000,
+
+            GenericWrite = 0x40000000,
+
+            GenericExecute = 0x20000000,
+
+            GenericAll = 0x10000000,
+
+            SPECIFIC_RIGHTS_ALL = 0x00FFFF,
+
+            FILE_ALL_ACCESS = StandardRightsRequired | Synchronize | 0x1FF,
+
+            FILE_GENERIC_READ = StandardRightsRead | FILE_READ_DATA | FILE_READ_ATTRIBUTES | FILE_READ_EA | Synchronize,
+
+            FILE_GENERIC_WRITE =
+                StandardRightsWrite | FILE_WRITE_DATA | FILE_WRITE_ATTRIBUTES | FILE_WRITE_EA | FILE_APPEND_DATA
+                | Synchronize,
+
+            FILE_GENERIC_EXECUTE = StandardRightsExecute | FILE_READ_ATTRIBUTES | FILE_EXECUTE | Synchronize
+        }
+
+        #region File Flags and attributes
+        public const short FILE_ATTRIBUTE_NORMAL = 0x80;
+
+        public const uint GENERIC_READ = 0x80000000;
+
+        public const uint GENERIC_WRITE = 0x40000000;
+
+        public const uint CREATE_NEW = 1;
+
+        public const uint CREATE_ALWAYS = 2;
+
+        public const uint OPEN_EXISTING = 3;
+
+        public const uint FILE_FLAG_BACKUP_SEMANTICS = 0x2000000;
+
+        public const uint FILE_FLAG_DELETE_ON_CLOSE = 0x4000000;
+
+        public const uint FILE_FLAG_NO_BUFFERING = 0x20000000;
+
+        public const uint FILE_FLAG_OPEN_NO_RECALL = 0x100000;
+
+        public const uint FILE_FLAG_OPEN_REPARSE_POINT = 0x200000;
+
+        public const uint FILE_FLAG_OVERLAPPED = 0x40000000;
+
+        public const uint FILE_FLAG_POSIX_SEMANTICS = 0x1000000;
+
+        public const uint FILE_FLAG_RANDOM_ACCESS = 0x10000000;
+
+        public const uint FILE_FLAG_SEQUENTIAL_SCAN = 0x8000000;
+
+        public const uint FILE_FLAG_WRITE_THROUGH = 0x80000000; 
+        #endregion
 
         #endregion
 
@@ -233,6 +347,47 @@ namespace ReallyStopDebugger.Native
 
         [DllImport("kernel32.dll", SetLastError = true)]
         internal static extern IntPtr LocalFree(IntPtr hMem);
+
+        [DllImport("psapi.dll")]
+        internal static extern uint GetProcessImageFileName(
+            IntPtr hProcess,
+            [Out] StringBuilder lpImageFileName,
+            [In] [MarshalAs(UnmanagedType.U4)] int nSize);
+
+        [DllImport("Kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        internal static extern uint GetFinalPathNameByHandle(
+            IntPtr hFile,
+            [MarshalAs(UnmanagedType.LPTStr)] StringBuilder lpszFilePath,
+            uint cchFilePath,
+            uint dwFlags);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        internal static extern SafeFileHandle CreateFileW(
+            [MarshalAs(UnmanagedType.LPWStr)] string filename,
+            [MarshalAs(UnmanagedType.U4)] uint access,
+            [MarshalAs(UnmanagedType.U4)] FileShare share,
+            IntPtr securityAttributes,
+            [MarshalAs(UnmanagedType.U4)] uint creationDisposition,
+            [MarshalAs(UnmanagedType.U4)] uint flagsAndAttributes,
+            IntPtr templateFile);
+
+        [DllImport("kernel32.dll", EntryPoint = "GetFinalPathNameByHandleW", CharSet = CharSet.Unicode,
+             SetLastError = true)]
+        internal static extern int GetFinalPathNameByHandleW(
+            SafeFileHandle handle,
+            [In] [Out] StringBuilder path,
+            int bufLen,
+            int flags);
+
+        #endregion
+
+        #region Misc Constants
+
+        public const short INVALID_HANDLE_VALUE = -1;
+
+        private const int MAX_PATH_SIZE = 0x00000104 - 1;
+
+        private const string DefaultInvalidPath = "N/A";
 
         #endregion
 
@@ -398,9 +553,9 @@ namespace ReallyStopDebugger.Native
                     .ToList();
         }
 
-        public static string GetProcessPath(int processId)
+        public static string GetProcessFilePathEx(int processId)
         {
-            var result = "N/A";
+            var result = DefaultInvalidPath;
             var processHandle = IntPtr.Zero;
 
             try
@@ -415,10 +570,9 @@ namespace ReallyStopDebugger.Native
                     return result;
                 }
 
-                const int Size = 1024;
-                var baseNameBuilder = new StringBuilder(Size);
+                var baseNameBuilder = new StringBuilder(MAX_PATH_SIZE);
 
-                if (GetModuleFileNameEx(processHandle, IntPtr.Zero, baseNameBuilder, Size) > 0)
+                if (GetModuleFileNameEx(processHandle, IntPtr.Zero, baseNameBuilder, MAX_PATH_SIZE) > 0)
                 {
                     result = baseNameBuilder.ToString();
                 }
@@ -435,11 +589,50 @@ namespace ReallyStopDebugger.Native
             return result;
         }
 
-        public static string GetProcessFileName(int processId)
+        public static string GetProcessFilePath(int processId)
         {
-            var processPath = GetProcessPath(processId);
+            StringBuilder imageFileName = new StringBuilder(MAX_PATH_SIZE);
+            IntPtr processHandle = IntPtr.Zero;
 
-            return processPath.Equals("N/A") ? processPath : Path.GetFileName(processPath);
+            try
+            {
+                processHandle = OpenProcess(ProcessAccessFlags.All, true, processId);
+
+                GetProcessImageFileName(processHandle, imageFileName, MAX_PATH_SIZE);
+            }
+            finally
+            {
+                CloseHandle(processHandle);
+            }
+
+            return ConvertDevicePath(imageFileName.ToString());
+        }
+
+        private static string ConvertDevicePath(string filePath)
+        {
+            StringBuilder path = new StringBuilder(MAX_PATH_SIZE);
+            if (string.IsNullOrWhiteSpace(filePath)) return DefaultInvalidPath;
+
+            using (
+                var safeFileHandle = CreateFileW(
+                    filePath.Replace(@"Device\", @"\?\"),
+                    (uint)FileAccess.FILE_GENERIC_READ,
+                    FileShare.Read | FileShare.Write | FileShare.Delete,
+                    IntPtr.Zero,
+                    OPEN_EXISTING,
+                    FILE_FLAG_BACKUP_SEMANTICS,
+                    IntPtr.Zero))
+            {
+                if (safeFileHandle.IsInvalid) return DefaultInvalidPath;
+
+                var result = GetFinalPathNameByHandleW(safeFileHandle, path, MAX_PATH_SIZE, 0x0);
+
+                if ((result == 0) || (result > MAX_PATH_SIZE)) return DefaultInvalidPath;
+
+                filePath = path.ToString().Replace(@"\\?\", string.Empty);
+            }
+
+            return filePath;
         }
     }
 }

@@ -159,7 +159,7 @@
     <Compile Include="Common\ProcessHelper.cs" />
     <Compile Include="Native\SafeHandles\SafeGDIObjectHandle.cs" />
     <Compile Include="Native\SafeHandles\SafeHGlobalHandle.cs" />
-    <Compile Include="Native\WindowsInterop.cs" />
+    <Compile Include="Native\WindowsNative.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="PkgCmdID.cs" />

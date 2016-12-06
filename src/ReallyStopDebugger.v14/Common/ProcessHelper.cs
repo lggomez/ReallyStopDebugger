@@ -28,7 +28,7 @@ namespace ReallyStopDebugger.Common
             try
             {
                 var runningProcesses = restrictUser
-                                           ? WindowsInterop.GetCurrentUserProcesses()
+                                           ? WindowsNative.GetCurrentUserProcesses()
                                            : Process.GetProcesses().ToList();
 
                 var filteredProcesses =
@@ -40,7 +40,7 @@ namespace ReallyStopDebugger.Common
 
                 if (restrictChildren)
                 {
-                    var childProcesses = WindowsInterop.GetChildProcesses(WindowsInterop.GetCurrentProcess().Id);
+                    var childProcesses = WindowsNative.GetChildProcesses(WindowsNative.GetCurrentProcess().Id);
 
                     filteredProcesses =
                         (from p in filteredProcesses join c in childProcesses on p.Id equals c.Id select p).ToList();
@@ -100,12 +100,7 @@ namespace ReallyStopDebugger.Common
 
         public static string GetProcessPath(Process process)
         {
-            return WindowsInterop.GetProcessPath(process.Id);
-        }
-
-        public static string GetProcessFileName(Process process)
-        {
-            return WindowsInterop.GetProcessFileName(process.Id);
+            return WindowsNative.GetProcessFilePath(process.Id);
         }
 
         public static Icon GetProcessIcon(Process process)

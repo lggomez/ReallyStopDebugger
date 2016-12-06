@@ -131,11 +131,11 @@ namespace ReallyStopDebugger
 
         private void LoadChildProcessesButtonClick(object sender, RoutedEventArgs e)
         {
-            var childProcesses = WindowsInterop.GetChildProcesses(WindowsInterop.GetCurrentProcess().Id);
+            var childProcesses = WindowsNative.GetChildProcesses(WindowsNative.GetCurrentProcess().Id);
 
             // TODO: Remove this on release
 #if DEBUG
-            var processes = WindowsInterop.GetCurrentUserProcesses();
+            var processes = WindowsNative.GetCurrentUserProcesses();
             childProcesses.AddRange(processes);
 #endif
 
