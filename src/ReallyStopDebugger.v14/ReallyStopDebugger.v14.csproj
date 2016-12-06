@@ -157,6 +157,8 @@
     <Compile Include="Common\FileUtils.cs" />
     <Compile Include="Native\PackageExtensions.cs" />
     <Compile Include="Common\ProcessHelper.cs" />
+    <Compile Include="Native\SafeHandles\SafeGDIObjectHandle.cs" />
+    <Compile Include="Native\SafeHandles\SafeHGlobalHandle.cs" />
     <Compile Include="Native\WindowsInterop.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Guids.cs" />

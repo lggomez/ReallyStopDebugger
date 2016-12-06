@@ -189,39 +189,39 @@ namespace ReallyStopDebugger.Native
         #region Winapi dll imports
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern IntPtr OpenProcess(ProcessAccessFlags processAccess, bool bInheritHandle, int processId);
+        internal static extern IntPtr OpenProcess(ProcessAccessFlags processAccess, bool bInheritHandle, int processId);
 
-        [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Ansi)]
-        static extern IntPtr CreateToolhelp32Snapshot([In] uint dwFlags, [In] uint th32ProcessId);
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
+        internal static extern IntPtr CreateToolhelp32Snapshot([In] uint dwFlags, [In] uint th32ProcessId);
 
-        [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Ansi)]
-        static extern bool Process32First([In] IntPtr hSnapshot, ref Processentry32 lppe);
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
+        internal static extern bool Process32First([In] IntPtr hSnapshot, ref Processentry32 lppe);
 
-        [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Ansi)]
-        static extern bool Process32Next([In] IntPtr hSnapshot, ref Processentry32 lppe);
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
+        internal static extern bool Process32Next([In] IntPtr hSnapshot, ref Processentry32 lppe);
 
         [DllImport("advapi32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool OpenProcessToken(IntPtr processHandle, uint desiredAccess, out IntPtr tokenHandle);
+        internal static extern bool OpenProcessToken(IntPtr processHandle, uint desiredAccess, out IntPtr tokenHandle);
 
         [DllImport("advapi32", SetLastError = true, CharSet = CharSet.Auto)]
-        static extern bool GetTokenInformation(
+        internal static extern bool GetTokenInformation(
             IntPtr hToken,
             TOKEN_INFORMATION_CLASS tokenInfoClass,
             IntPtr tokenInformation,
             int tokeInfoLength,
             ref int reqLength);
 
-        [DllImport("kernel32", SetLastError = true)]
-        static extern bool CloseHandle(IntPtr handle);
+        [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern bool CloseHandle(IntPtr handle);
 
         [DllImport("advapi32", SetLastError = true, CharSet = CharSet.Auto)]
-        static extern bool ConvertSidToStringSid(
+        internal static extern bool ConvertSidToStringSid(
             IntPtr pSid,
             [In] [Out] [MarshalAs(UnmanagedType.LPTStr)] ref string pStringSid);
 
         [DllImport("psapi.dll")]
-        static extern uint GetModuleFileNameEx(
+        internal static extern uint GetModuleFileNameEx(
             IntPtr hProcess,
             IntPtr hModule,
             [Out] StringBuilder lpBaseName,
@@ -230,6 +230,9 @@ namespace ReallyStopDebugger.Native
         [DllImport("gdi32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool DeleteObject(IntPtr hObject);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern IntPtr LocalFree(IntPtr hMem);
 
         #endregion
 

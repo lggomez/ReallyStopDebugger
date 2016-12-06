@@ -35,21 +35,20 @@ namespace ReallyStopDebugger.Native
             BitmapSource bitmapSource;
             var hBitmap = source.GetHbitmap();
 
-            try
+            using (new SafeHandles.SafeGDIObjectHandle(hBitmap))
             {
-                bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(
-                    hBitmap,
-                    IntPtr.Zero,
-                    Int32Rect.Empty,
-                    BitmapSizeOptions.FromEmptyOptions());
-            }
-            catch (Win32Exception)
-            {
-                bitmapSource = null;
-            }
-            finally
-            {
-                WindowsInterop.DeleteObject(hBitmap);
+                try
+                {
+                    bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(
+                        hBitmap,
+                        IntPtr.Zero,
+                        Int32Rect.Empty,
+                        BitmapSizeOptions.FromEmptyOptions());
+                }
+                catch (Win32Exception)
+                {
+                    bitmapSource = null;
+                }
             }
 
             return bitmapSource;

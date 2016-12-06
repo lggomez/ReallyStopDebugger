@@ -1,14 +1,21 @@
 v2.0
+	-Fix: Prevent handle leaks on hard crashes
 	-Fix: Code cleanup, avoid NRE's in several methods
 	-Fix: Control layout in the Config tool window
 	-Fix: Several bugs in the save and retrieval of extension settings
+
 	-Change: Running processes that are matched now are separated from
 		the custom process name list
 	-Change: Removed VS 2013 solution and compatibility. Files are now grouped 
 		in a single VS 2015 project, using C# 6
 	-Change: Changed size of tool window control
+
 	-New: UI - Added DataGrids to replace the old input textbox. Processes 
 		now show additional information and may be selected from the new grid
+	-New: VS 15 support (Experimental, see README)
+
+	-Known defect: In multiple display setups the config window may not show
+		in the same screen as the VS instance
 
 v1.3
 	-Fix: Force delete previous value retrieval
