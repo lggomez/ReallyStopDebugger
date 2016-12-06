@@ -39,7 +39,6 @@ namespace ReallyStopDebugger.Controls
             // Default control states
             this.processCriteriaRadioButton_allProcesses.IsChecked = true;
             this.userCriteriaRadioButton_allUsers.IsChecked = true;
-            this.StatusLabel.Visibility = Visibility.Hidden;
 
             this.Loaded += this.ReallyStopDebuggerConfigLoaded;
             this.Unloaded += this.ReallyStopDebuggerConfigUnloaded;
@@ -57,7 +56,7 @@ namespace ReallyStopDebugger.Controls
                 this.StatusLabel.Content =
                     $"Visual Studio instance not found.{Environment.NewLine}Please reopen this window and try again";
                 this.StatusLabel.Foreground = Brushes.Red;
-                this.StatusLabel.Visibility = Visibility.Visible;
+
                 return;
             }
 
@@ -97,8 +96,6 @@ namespace ReallyStopDebugger.Controls
             }
 
             #region UI update
-
-            this.StatusLabel.Visibility = Visibility.Visible;
 
             string returnMessage;
 
@@ -208,6 +205,7 @@ namespace ReallyStopDebugger.Controls
         private void ReallyStopDebuggerConfigUnloaded(object sender, RoutedEventArgs e)
         {
             this.processDisplayDataGrid.ItemsSource = null;
+            this.StatusLabel.Content = string.Empty;
             this.SaveExtensionSettings();
         }
 
