@@ -164,11 +164,11 @@
     <Compile Include="Guids.cs" />
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReallyStopDebuggerConfigControl.xaml.cs" />
+    <Compile Include="Controls\ReallyStopDebuggerConfigControl.xaml.cs" />
     <Compile Include="Native\ImageExtensions.cs" />
     <Compile Include="Native\DTEHelpers.cs" />
     <Compile Include="Common\ProcessInfo.cs" />
-    <Compile Include="ReallyStopDebuggerToolWindow.cs" />
+    <Compile Include="Controls\ReallyStopDebuggerToolWindow.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -215,7 +215,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="ReallyStopDebuggerConfigControl.xaml">
+    <Page Include="Controls\ReallyStopDebuggerConfigControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

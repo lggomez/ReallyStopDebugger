@@ -9,13 +9,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-using ReallyStopDebugger.Common;
-using ReallyStopDebugger.Native;
-
 using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
 
-namespace ReallyStopDebugger
+using ReallyStopDebugger.Common;
+using ReallyStopDebugger.Native;
+
+namespace ReallyStopDebugger.Controls
 {
     /// <summary>
     /// Interaction logic for MyControl.xaml

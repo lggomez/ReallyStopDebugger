@@ -13,6 +13,7 @@ using System.ComponentModel.Design;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
+using ReallyStopDebugger.Controls;
 using ReallyStopDebugger.Native;
 
 namespace ReallyStopDebugger
@@ -77,8 +78,8 @@ namespace ReallyStopDebugger
 
             var windowFrame = (IVsWindowFrame)window.Frame;
 
-            ((MyControl)window.Content).CurrentPackage = this;
-            ((MyControl)window.Content).SettingsManager = new ShellSettingsManager(this);
+            ((Controls.MyControl)window.Content).CurrentPackage = this;
+            ((Controls.MyControl)window.Content).SettingsManager = new ShellSettingsManager(this);
 
             ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
