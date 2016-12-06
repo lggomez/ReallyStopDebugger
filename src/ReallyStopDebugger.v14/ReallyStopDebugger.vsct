@@ -98,7 +98,13 @@
 
   </Commands>
 
-  
+  <KeyBindings>
+    <KeyBinding guid="guidReallyStopDebuggerCmdSet" id="cmdidReallyStopDebuggerLite"
+        editor="guidVSStd97" key1="D" mod1="CONTROL" key2="D" mod2="CONTROL"/>
+    <KeyBinding guid="guidReallyStopDebuggerCmdSet" id="cmdidReallyStopDebuggerCfg"
+        editor="guidVSStd97" key1="D" mod1="CONTROL" key2="C" mod2="CONTROL"/>
+  </KeyBindings>
+
   <Symbols>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidReallyStopDebuggerPkg" value="{F4802ACB-BF36-4A39-98C5-C7C24CDB82FA}" />

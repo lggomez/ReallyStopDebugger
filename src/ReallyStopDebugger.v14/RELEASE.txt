@@ -13,6 +13,9 @@ v2.0
 	-New: UI - Added DataGrids to replace the old input textbox. Processes 
 		now show additional information and may be selected from the new grid
 	-New: VS 15 support (Experimental, see README)
+	-New: Added custom icons
+	-New: Added Keyboard Shortcuts for both silent (Ctrl+D, Ctrl+D) and 
+		configuration (Ctrl+D, Ctrl+C) modes
 
 	-Known defect: In multiple display setups the config window may not show
 		in the same screen as the VS instance

@@ -21,12 +21,12 @@ If you decide to install the extension for this version, keep in mind the follow
 
 ##Usage
 ReallyStopDebugger has 2 modes (Tools menu):
-* Normal mode: In this windowed mode you can set up which processes you want to target, along with additional options
-* Silent mode: This mode runs the extension silently, using the last configuration used in the normal mode, and redirects status messages to the Output window (if available)
+* Normal mode (also called configuration mode) (Ctrl+D, Ctrl+C): In this windowed mode you can set up which processes you want to target, along with additional options
+* Silent mode (Ctrl+D, Ctrl+D): This mode runs the extension silently, using the last configuration used in the normal mode, and redirects status messages to the Output window (if available)
 
 Both modes will stop the debug and build operations
 
-##Configuration (normal mode)
+##Configuration window options
 * User criteria - Lets you choose beteween targeting all proceses or only those running as your current user. Useful for shared development environments, such as VMs
 * Process criteria - Lets you add another filtering beteween all processes or only those spawned by the visual studio instance
 * Attempt to force clean solution - Will try to manually erase /bin and /obj directories in the solution. Requires VS to be run as Administrator to work properly
@@ -42,4 +42,3 @@ To compile and run the solution Visual Studio 2015 Community Edition is required
 
 ##TODOs
 - Improve directory cleaning support
-- Add keyboard shortcut commands
