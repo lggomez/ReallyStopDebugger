@@ -68,7 +68,7 @@ namespace ReallyStopDebugger
             // The last flag is set to true so that if the tool window does not exist it will be created.
             var window = this.FindToolWindow(typeof(ReallyStopDebuggerToolWindow), 0, true) as ReallyStopDebuggerToolWindow;
 
-            if ((null == window) || (null == window.Frame))
+            if (window?.Frame == null)
             {
                 throw new NotSupportedException(Resources.CanNotCreateWindow);
             }
@@ -172,7 +172,7 @@ namespace ReallyStopDebugger
                 #region Configuration retrieval & process killing
 
                 // Default values. These may be overriden upon configuration store retrieval
-                var filter = new string[] { "MSBuild", "WebDev.WebServer40", "Microsoft.VisualStudio.Web.Host" };
+                var filter = new[] { "MSBuild" };
 
                 var configurationSettingsStore = (new ShellSettingsManager(this)).GetReadOnlySettingsStore(SettingsScope.UserSettings);
                 var collectionExists = configurationSettingsStore.CollectionExists("ReallyStopDebugger");
@@ -198,7 +198,6 @@ namespace ReallyStopDebugger
                     }
 
                     result = ProcessHelper.KillProcesses(this, filter.ToArray(), filterByLocalUser, filterByChildren, true);
-                    
                 }
                 else
                 {

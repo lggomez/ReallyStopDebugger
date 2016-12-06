@@ -60,7 +60,7 @@
 
       <Button guid="guidReallyStopDebuggerCmdSet" id="cmdidReallyStopDebugger" priority="0x0100" type="Button">
         <Parent guid="guidReallyStopDebuggerCmdSet" id="MyMenuGroup" />
-        <Icon guid="guidImages" id="bmpPic1" />
+        <Icon guid="guidReallyStopDebuggerIcons" id="bmpPicConfig" />
         <Strings>
           <ButtonText>ReallyStopDebugger</ButtonText>
         </Strings>
@@ -68,7 +68,7 @@
 
       <Button guid="guidReallyStopDebuggerCmdSet" id="cmdidReallyStopDebuggerLite" priority="0x0100" type="Button">
         <Parent guid="guidReallyStopDebuggerCmdSet" id="MyMenuGroup" />
-        <Icon guid="guidImages" id="bmpPic1" />
+        <Icon guid="guidReallyStopDebuggerIcons" id="bmpPicSilent" />
         <Strings>
           <ButtonText>ReallyStopDebugger (silent)</ButtonText>
         </Strings>
@@ -76,7 +76,7 @@
 
       <Button guid="guidReallyStopDebuggerCmdSet" id="cmdidReallyStopDebuggerCfg" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-        <Icon guid="guidImages" id="bmpPic2" />
+        <Icon guid="guidReallyStopDebuggerIcons" id="bmpPicConfig" />
         <Strings>
           <ButtonText>ReallyStopDebugger Config</ButtonText>
         </Strings>
@@ -93,7 +93,7 @@
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
       <Bitmap guid="guidImages" href="Resources\Images.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows"/>
-
+      <Bitmap guid="guidReallyStopDebuggerIcons" href="Resources\reallystopDebuggerIcons16.ico" usedList="bmpPicConfig, bmpPicSilent"/>
     </Bitmaps>
 
   </Commands>
@@ -119,6 +119,11 @@
       <IDSymbol name="bmpPicX" value="4" />
       <IDSymbol name="bmpPicArrows" value="5" />
       <IDSymbol name="bmpPicStrikethrough" value="6" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidReallyStopDebuggerIcons" value="{30421eda-9170-4791-80f7-0d2ee10ae51b}" >
+      <IDSymbol name="bmpPicConfig" value="1" />
+      <IDSymbol name="bmpPicSilent" value="2" />
     </GuidSymbol>
   </Symbols>
 

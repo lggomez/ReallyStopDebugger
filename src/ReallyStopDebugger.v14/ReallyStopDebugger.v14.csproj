@@ -225,6 +225,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <None Include="Resources\reallystopDebuggerIcons16.ico" />
+    <None Include="Resources\reallystopDebugger48.png" />
+    <None Include="Resources\reallystopDebugger32.ico" />
+    <None Include="Resources\reallystopDebugger16.ico" />
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>

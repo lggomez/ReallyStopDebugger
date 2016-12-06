@@ -39,7 +39,7 @@ namespace ReallyStopDebugger {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    var temp = new global::System.Resources.ResourceManager("ReallyStopDebugger.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ReallyStopDebugger.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -66,6 +66,46 @@ namespace ReallyStopDebugger {
         internal static string CanNotCreateWindow {
             get {
                 return ResourceManager.GetString("CanNotCreateWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon reallystopDebugger16 {
+            get {
+                object obj = ResourceManager.GetObject("reallystopDebugger16", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon reallystopDebugger32 {
+            get {
+                object obj = ResourceManager.GetObject("reallystopDebugger32", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap reallystopDebugger48 {
+            get {
+                object obj = ResourceManager.GetObject("reallystopDebugger48", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon reallystopDebuggerIcons16 {
+            get {
+                object obj = ResourceManager.GetObject("reallystopDebuggerIcons16", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
         
