@@ -284,15 +284,13 @@ namespace ReallyStopDebugger.Native
         public static bool GetProcessUser(IntPtr processHandle, out string userSid)
         {
             userSid = null;
+            IntPtr processToken = IntPtr.Zero;
 
             try
             {
-                IntPtr processToken;
-
                 if (OpenProcessToken(processHandle, TokenQuery, out processToken))
                 {
                     GetUserSidFromProcessToken(processToken, out userSid);
-                    CloseHandle(processToken);
                 }
 
                 return Marshal.GetLastWin32Error() == 0;
@@ -300,6 +298,10 @@ namespace ReallyStopDebugger.Native
             catch (Exception)
             {
                 return false;
+            }
+            finally
+            {
+                CloseHandle(processToken);
             }
         }
 
@@ -399,26 +401,36 @@ namespace ReallyStopDebugger.Native
         public static string GetProcessPath(int processId)
         {
             var result = "N/A";
+            var processHandle = IntPtr.Zero;
 
-            var processHandle = OpenProcess(
-                ProcessAccessFlags.VirtualMemoryRead | ProcessAccessFlags.QueryInformation,
-                false,
-                processId);
-
-            if (processHandle == IntPtr.Zero)
+            try
             {
-                return result;
-            }
+                processHandle = OpenProcess(
+                    ProcessAccessFlags.VirtualMemoryRead | ProcessAccessFlags.QueryInformation,
+                    false,
+                    processId);
 
-            const int Size = 1024;
-            var baseNameBuilder = new StringBuilder(Size);
-            
-            if (GetModuleFileNameEx(processHandle, IntPtr.Zero, baseNameBuilder, Size) > 0)
+                if (processHandle == IntPtr.Zero)
+                {
+                    return result;
+                }
+
+                const int Size = 1024;
+                var baseNameBuilder = new StringBuilder(Size);
+
+                if (GetModuleFileNameEx(processHandle, IntPtr.Zero, baseNameBuilder, Size) > 0)
+                {
+                    result = baseNameBuilder.ToString();
+                }
+                else
+                {
+                    Debug.WriteLine(processHandle.ToString());
+                }
+            }
+            finally
             {
-                result = baseNameBuilder.ToString();
+                CloseHandle(processHandle);
             }
-
-            CloseHandle(processHandle);
 
             return result;
         }
