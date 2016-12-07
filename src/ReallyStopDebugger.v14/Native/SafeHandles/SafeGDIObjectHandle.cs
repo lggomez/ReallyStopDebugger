@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Luis Gómez. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the src\ReallyStopDebugger directory for full license information.
+
+using System;
 using System.Runtime.InteropServices;
 
 namespace ReallyStopDebugger.Native.SafeHandles
