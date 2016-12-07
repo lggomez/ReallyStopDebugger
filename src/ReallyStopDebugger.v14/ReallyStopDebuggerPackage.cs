@@ -78,8 +78,10 @@ namespace ReallyStopDebugger
 
             var windowFrame = (IVsWindowFrame)window.Frame;
 
-            ((Controls.MyControl)window.Content).CurrentPackage = this;
-            ((Controls.MyControl)window.Content).SettingsManager = new ShellSettingsManager(this);
+            var myControl = (MyControl)window.Content;
+            myControl.CurrentPackage = this;
+            myControl.SettingsManager = new ShellSettingsManager(this);
+            WindowsNative.ResizeWindowFromHandle(window.Window.Handle, (int)myControl.Width, (int)myControl.Height);
 
             ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }

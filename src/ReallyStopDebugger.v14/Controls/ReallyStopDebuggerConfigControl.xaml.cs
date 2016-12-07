@@ -130,7 +130,7 @@ namespace ReallyStopDebugger.Controls
 
         private void LoadChildProcessesButtonClick(object sender, RoutedEventArgs e)
         {
-            DoProcessLoadWork(this.LoadProcessDependencies);
+            this.DoProcessLoadWork(this.LoadProcessDependencies);
             this.RefreshProcessDisplayDataGrid();
         }
 
@@ -205,6 +205,7 @@ namespace ReallyStopDebugger.Controls
         {
             var childProcesses = LoadChildProcesses(progress);
 #if DEBUG
+
             // TODO: Remove this on release
             var processes = WindowsNative.GetCurrentUserProcesses();
             childProcesses.AddRange(processes);

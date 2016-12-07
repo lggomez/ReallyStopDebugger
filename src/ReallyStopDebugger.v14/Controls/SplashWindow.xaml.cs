@@ -9,7 +9,7 @@ namespace ReallyStopDebugger.Controls
     {
         public SplashWindow()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }
