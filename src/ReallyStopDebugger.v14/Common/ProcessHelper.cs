@@ -34,23 +34,23 @@ namespace ReallyStopDebugger.Common
                 var filteredProcesses =
                     runningProcesses.Join(
                         processNames.Cast<string>(),
-                        p => p.ProcessName.ToLower(),
+                        p => p.SafeGetProcessName().ToLower(),
                         n => (n ?? string.Empty).ToLower(),
                         (p, n) => p).ToList();
 
                 if (restrictChildren)
                 {
-                    var childProcesses = WindowsNative.GetChildProcesses(WindowsNative.GetCurrentProcess().Id);
+                    var childProcesses = WindowsNative.GetChildProcesses(WindowsNative.GetCurrentProcess().SafeGetProcessId());
 
                     filteredProcesses =
-                        (from p in filteredProcesses join c in childProcesses on p.Id equals c.Id select p).ToList();
+                        (from p in filteredProcesses join c in childProcesses on p.SafeGetProcessId() equals c.SafeGetProcessId() select p).ToList();
                 }
 
                 if (!filteredProcesses.Any()) return Constants.Processesnotfound;
 
                 foreach (var p in filteredProcesses)
                 {
-                    currentProcessName = p.ProcessName;
+                    currentProcessName = p.SafeGetProcessName();
                     p.Kill();
                 }
             }
@@ -100,7 +100,7 @@ namespace ReallyStopDebugger.Common
 
         public static string GetProcessPath(Process process)
         {
-            return WindowsNative.GetProcessFilePath(process.Id);
+            return WindowsNative.GetProcessFilePath(process.SafeGetProcessId());
         }
 
         public static Icon GetProcessIcon(Process process)

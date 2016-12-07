@@ -22,6 +22,7 @@ namespace ReallyStopDebugger.Native
             using (var bitmap = new Bitmap(source.ToBitmap()))
             {
                 bitmapSource = bitmap.ToBitmapSource();
+                bitmapSource.Freeze();
             }
 
             return bitmapSource;
@@ -44,6 +45,8 @@ namespace ReallyStopDebugger.Native
                         IntPtr.Zero,
                         Int32Rect.Empty,
                         BitmapSizeOptions.FromEmptyOptions());
+
+                    bitmapSource.Freeze();
                 }
                 catch (Win32Exception)
                 {

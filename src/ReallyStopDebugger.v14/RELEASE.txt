@@ -3,6 +3,8 @@ v2.0
 	-Fix: Code cleanup, avoid NRE's in several methods
 	-Fix: Control layout in the Config tool window
 	-Fix: Several bugs in the save and retrieval of extension settings
+	-Fix: Improved process handling that didn't catch exceptions on certain
+		scenarios
 
 	-Change: Running processes that are matched now are separated from
 		the custom process name list
@@ -12,6 +14,7 @@ v2.0
 
 	-New: UI - Added DataGrids to replace the old input textbox. Processes 
 		now show additional information and may be selected from the new grid
+	-New: Loading screen when loading processes
 	-New: VS 15 support (Experimental, see README)
 	-New: Added custom icons
 	-New: Added Keyboard Shortcuts for both silent (Ctrl+D, Ctrl+D) and 

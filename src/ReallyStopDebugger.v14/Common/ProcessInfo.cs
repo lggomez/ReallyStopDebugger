@@ -7,6 +7,7 @@ using System.Linq;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
+
 using ReallyStopDebugger.Native;
 
 namespace ReallyStopDebugger.Common
@@ -22,7 +23,7 @@ namespace ReallyStopDebugger.Common
                         System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
                     .GetValue(null, null)).ToBitmapSource();
 
-        public int Id => this.originProcess.Id;
+        public int Id => this.originProcess.SafeGetProcessId();
 
         private BitmapSource executableIcon;
 
@@ -38,11 +39,9 @@ namespace ReallyStopDebugger.Common
             }
         }
 
-        public string ProcessName => this.originProcess.ProcessName;
+        public string ProcessName => this.originProcess.SafeGetProcessName();
 
         public string FilePath => ProcessHelper.GetProcessPath(this.originProcess);
-
-        public string UserName => this.originProcess.MainModule.FileName;
 
         public int ProcessCount { get; }
 

@@ -14,6 +14,8 @@ using System.Text;
 
 using Microsoft.Win32.SafeHandles;
 
+using ReallyStopDebugger.Common;
+
 namespace ReallyStopDebugger.Native
 {
     internal static class WindowsNative
@@ -393,7 +395,7 @@ namespace ReallyStopDebugger.Native
 
         public static IntPtr OpenProcess(Process proc, ProcessAccessFlags flags)
         {
-            return OpenProcess(flags, false, proc.Id);
+            return OpenProcess(flags, false, proc.SafeGetProcessId());
         }
 
         public static Process GetCurrentProcess()

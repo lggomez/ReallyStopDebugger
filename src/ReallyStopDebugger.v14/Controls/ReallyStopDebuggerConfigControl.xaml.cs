@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -128,25 +130,8 @@ namespace ReallyStopDebugger.Controls
 
         private void LoadChildProcessesButtonClick(object sender, RoutedEventArgs e)
         {
-            var childProcesses = WindowsNative.GetChildProcesses(WindowsNative.GetCurrentProcess().Id);
-
-            // TODO: Remove this on release
-#if DEBUG
-            var processes = WindowsNative.GetCurrentUserProcesses();
-            childProcesses.AddRange(processes);
-#endif
-
-            if (childProcesses.Any())
-            {
-                var childProcessesInfo =
-                    childProcesses.GroupBy(p => p.ProcessName, StringComparer.InvariantCultureIgnoreCase)
-                        .Select(g => new ProcessInfo(g))
-                        .ToList();
-
-                this.AllProcessesSelected = false;
-                this.Processes = childProcessesInfo;
-                this.RefreshProcessDisplayDataGrid();
-            }
+            DoProcessLoadWork(this.LoadProcessDependencies);
+            this.RefreshProcessDisplayDataGrid();
         }
 
         private void ProcessSelectionHeader_OnChecked(object sender, RoutedEventArgs e)
@@ -185,11 +170,69 @@ namespace ReallyStopDebugger.Controls
 
                 // NOTE: calling .RemoveAll can cause a ArgumentOutOfRangeException 
                 // in the RefreshCustomProcessDisplayDataGrid null assignment. Possible compiler bug?
-                this.CustomProcesses = this.CustomProcesses.Where(_ => !string.IsNullOrWhiteSpace(_.ProcessName)).ToList();
+                this.CustomProcesses =
+                    this.CustomProcesses.Where(_ => !string.IsNullOrWhiteSpace(_.ProcessName)).ToList();
                 this.RefreshCustomProcessDisplayDataGrid();
             }
 
             this.ResetCustomProcessDisplayDataGridFocus();
+        }
+
+        #endregion
+
+        #region Workers and process handling code
+
+        public void DoProcessLoadWork(Action<IProgress<string>> processLoadAction)
+        {
+            SplashWindow splash = new SplashWindow();
+
+            splash.Loaded += (_, eventArgs) =>
+            {
+                BackgroundWorker worker = new BackgroundWorker();
+                Progress<string> progress = new Progress<string>(data => splash.label.Content = data);
+
+                worker.DoWork += (s, workEventArgs) => processLoadAction(progress);
+                worker.RunWorkerCompleted += (s, completedEventArgs) => splash.Close();
+
+                worker.RunWorkerAsync();
+            };
+
+            this.CalculateSplashCoordinates(splash);
+            splash.ShowDialog();
+        }
+
+        private void LoadProcessDependencies(IProgress<string> progress)
+        {
+            var childProcesses = LoadChildProcesses(progress);
+#if DEBUG
+            // TODO: Remove this on release
+            var processes = WindowsNative.GetCurrentUserProcesses();
+            childProcesses.AddRange(processes);
+#endif
+            this.MapProcessResults(progress, childProcesses);
+        }
+
+        private static List<Process> LoadChildProcesses(IProgress<string> progress)
+        {
+            progress.Report("Loading process dependencies");
+            var childProcesses = WindowsNative.GetChildProcesses(WindowsNative.GetCurrentProcess().SafeGetProcessId());
+            return childProcesses;
+        }
+
+        private void MapProcessResults(IProgress<string> progress, List<Process> childProcesses)
+        {
+            progress.Report("Mapping results to grid");
+            if (childProcesses.Any())
+            {
+                var childProcessesInfo =
+                    childProcesses.GroupBy(p => p.SafeGetProcessName(), StringComparer.InvariantCultureIgnoreCase)
+                        .Select(g => new ProcessInfo(g))
+                        .Where(c => !string.IsNullOrEmpty(c.ProcessName))
+                        .ToList();
+
+                this.AllProcessesSelected = false;
+                this.Processes = childProcessesInfo;
+            }
         }
 
         #endregion
@@ -228,10 +271,22 @@ namespace ReallyStopDebugger.Controls
         private void ResetCustomProcessDisplayDataGridFocus()
         {
             // Reset cell focus to last cell
-            this.processCustomDisplayDataGrid.CurrentCell = new DataGridCellInfo(
-            this.processCustomDisplayDataGrid.Items[this.processCustomDisplayDataGrid.Items.Count > 0 ? this.processCustomDisplayDataGrid.Items.Count - 1 : 0], this.processCustomDisplayDataGrid.Columns[0]);
+            this.processCustomDisplayDataGrid.CurrentCell =
+                new DataGridCellInfo(
+                    this.processCustomDisplayDataGrid.Items[
+                        this.processCustomDisplayDataGrid.Items.Count > 0
+                            ? this.processCustomDisplayDataGrid.Items.Count - 1
+                            : 0],
+                    this.processCustomDisplayDataGrid.Columns[0]);
             this.processCustomDisplayDataGrid.UnselectAllCells();
             this.processCustomDisplayDataGrid.BeginEdit();
+        }
+
+        private void CalculateSplashCoordinates(SplashWindow splash)
+        {
+            Point screenCoordinates = this.MyToolWindow.PointToScreen(new Point(0, 0));
+            splash.Left = screenCoordinates.X + (this.MyToolWindow.Width / 2) - (splash.Width / 2);
+            splash.Top = screenCoordinates.Y + (this.MyToolWindow.Height / 2) - splash.Height;
         }
 
         private void SaveExtensionSettings()
@@ -273,15 +328,17 @@ namespace ReallyStopDebugger.Controls
         {
             if (this.SettingsManager != null)
             {
-                var configurationSettingsStore = this.SettingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
+                var configurationSettingsStore =
+                    this.SettingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
                 var collectionExists = configurationSettingsStore.CollectionExists("ReallyStopDebugger");
 
                 if (collectionExists)
                 {
                     if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "CustomProcessList"))
                     {
-                        var propertyValue = configurationSettingsStore.GetString("ReallyStopDebugger", "CustomProcessList")
-                                            ?? string.Empty;
+                        var propertyValue = configurationSettingsStore.GetString(
+                                                "ReallyStopDebugger",
+                                                "CustomProcessList") ?? string.Empty;
                         var customProcesses =
                             propertyValue.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)
                                 .Distinct()
@@ -302,13 +359,15 @@ namespace ReallyStopDebugger.Controls
                     if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "UserProcessMatch"))
                     {
                         this.userCriteriaRadioButton_userOnly.IsChecked =
-                            Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "UserProcessMatch"));
+                            Convert.ToBoolean(
+                                configurationSettingsStore.GetString("ReallyStopDebugger", "UserProcessMatch"));
                     }
 
                     if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ChildProcessMatch"))
                     {
                         this.userCriteriaRadioButton_userOnly.IsChecked =
-                            Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "ChildProcessMatch"));
+                            Convert.ToBoolean(
+                                configurationSettingsStore.GetString("ReallyStopDebugger", "ChildProcessMatch"));
                     }
                 }
             }
