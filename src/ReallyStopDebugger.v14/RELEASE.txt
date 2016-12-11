@@ -5,6 +5,7 @@ v2.0
 	-Fix: Several bugs in the save and retrieval of extension settings
 	-Fix: Improved process handling that didn't catch exceptions on certain
 		scenarios
+	-Fix: Config tool window is now constant when it's shown up
 
 	-Change: Running processes that are matched now are separated from
 		the custom process name list

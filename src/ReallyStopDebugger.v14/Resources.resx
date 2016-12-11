@@ -136,4 +136,58 @@
   <data name="reallystopDebuggerIcons16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\reallystopDebuggerIcons16.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ErrorTitle" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Exception_General" xml:space="preserve">
+    <value>Exception: {0}{1}Inside {2}.MenuItemCallback()</value>
+  </data>
+  <data name="Exception_General_Lite" xml:space="preserve">
+    <value>Exception: {0}{1}Inside {2}.MenuItemCallbackLite()</value>
+  </data>
+  <data name="InvalidInstanceError_1" xml:space="preserve">
+    <value>Visual Studio instance not found.</value>
+  </data>
+  <data name="InvalidInstanceError_2" xml:space="preserve">
+    <value>Please reopen this window and try again</value>
+  </data>
+  <data name="ProcessesDefaultMessage" xml:space="preserve">
+    <value>Could not close orphaned processes due to an error.</value>
+  </data>
+  <data name="ProcessesDefaultMessageLite" xml:space="preserve">
+    <value>ReallyStopDebugger&gt;------ Could not close orphaned processes due to an error.</value>
+  </data>
+  <data name="ProcesseskillsuccessMessage" xml:space="preserve">
+    <value>Processes killed.</value>
+  </data>
+  <data name="ProcesseskillsuccessMessageLite" xml:space="preserve">
+    <value>ReallyStopDebugger&gt;------ Processes killed.</value>
+  </data>
+  <data name="ProcessesnotfoundMessage" xml:space="preserve">
+    <value>Could not find any matching processes.</value>
+  </data>
+  <data name="ProcessesnotfoundMessageLite" xml:space="preserve">
+    <value>ReallyStopDebugger&gt;------ Could not find any matching processes.</value>
+  </data>
+  <data name="ProgressReport_1" xml:space="preserve">
+    <value>Loading process dependencies</value>
+  </data>
+  <data name="ProgressReport_2" xml:space="preserve">
+    <value>Mapping results to grid</value>
+  </data>
+  <data name="ProcessKillError_General" xml:space="preserve">
+    <value>An exception has occurred: </value>
+  </data>
+  <data name="ProcessKillError_InvalidOperation" xml:space="preserve">
+    <value>The process has already exited or was not found.</value>
+  </data>
+  <data name="ProcessKillError_NotSupported" xml:space="preserve">
+    <value>Cannot kill a process running on a remote computer. Aborting.</value>
+  </data>
+  <data name="ProcessKillError_Prompt" xml:space="preserve">
+    <value>Error killing process: </value>
+  </data>
+  <data name="ProcessKillError_Win32" xml:space="preserve">
+    <value>The associated process could not be terminated, is terminating or is an invalid Win32 process.</value>
+  </data>
 </root>

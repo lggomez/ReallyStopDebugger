@@ -4,12 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+
+using EnvDTE;
 
 using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
@@ -19,20 +20,33 @@ using ReallyStopDebugger.Native;
 
 namespace ReallyStopDebugger.Controls
 {
+    using Constants = Common.Constants;
+    using Process = System.Diagnostics.Process;
+
     /// <summary>
     /// Interaction logic for MyControl.xaml
     /// </summary>
     public partial class MyControl : UserControl
     {
+        #region Extension properties
+
         internal Package CurrentPackage { get; set; }
 
         internal SettingsManager SettingsManager { get; set; }
+
+        internal DTE DTE { get; set; }
+
+        #endregion
+
+        #region Control properties
 
         public List<ProcessInfo> Processes { get; set; } = new List<ProcessInfo>();
 
         public List<CustomProcessInfo> CustomProcesses { get; set; } = new List<CustomProcessInfo>();
 
-        public bool AllProcessesSelected { get; set; }
+        public bool AllProcessesSelected { get; set; } 
+
+        #endregion
 
         public MyControl()
         {
@@ -50,26 +64,77 @@ namespace ReallyStopDebugger.Controls
 
         private void KillProcessesButtonClick(object sender, RoutedEventArgs e)
         {
-            #region Initialize
-
-            if (this.CurrentPackage == null)
-            {
-                // The control is in a faulted state or was instantiated before the package initialization
-                this.StatusLabel.Content =
-                    $"Visual Studio instance not found.{Environment.NewLine}Please reopen this window and try again";
-                this.StatusLabel.Foreground = Brushes.Red;
-
-                return;
-            }
-
+            if (this.IsPackageStateInvalid()) return;
             this.StatusLabel.Content = string.Empty;
-
-            #endregion
-
-            #region Stop debug mode
-
             var dte = ((ReallyStopDebuggerPackage)this.CurrentPackage).GetDte();
 
+            this.StopDebugMode(dte);
+
+            var result = this.KillProcesses();
+
+            this.AttemptHardClean(dte);
+
+            this.UpdateStatusFromResult(result);
+        }
+
+        private void UpdateStatusFromResult(int result)
+        {
+            string returnMessage;
+
+            switch (result)
+            {
+                case Constants.Processeskillsuccess:
+                    {
+                        returnMessage = ReallyStopDebugger.Resources.ProcesseskillsuccessMessage;
+                        this.StatusLabel.Foreground = Brushes.Green;
+                        break;
+                    }
+                case Constants.Processesnotfound:
+                    {
+                        returnMessage = ReallyStopDebugger.Resources.ProcessesnotfoundMessage;
+                        this.StatusLabel.Foreground = Brushes.Orange;
+                        break;
+                    }
+                default:
+                    {
+                        returnMessage = ReallyStopDebugger.Resources.ProcessesDefaultMessage;
+                        this.StatusLabel.Foreground = Brushes.Red;
+                        break;
+                    }
+            }
+
+            this.StatusLabel.Content = returnMessage;
+        }
+
+        private int KillProcesses()
+        {
+            var processNameList =
+                this.processDisplayDataGrid.ItemsSource.Cast<ProcessInfo>()
+                    .Where(p => p.IsSelected)
+                    .Select(_ => _.ProcessName)
+                    .Concat(this.GetCustomProcessNames())
+                    .Distinct()
+                    .ToList();
+
+            var result = ProcessHelper.KillProcesses(
+                this.CurrentPackage,
+                processNameList,
+                this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault(),
+                this.processCriteriaRadioButton_children.IsChecked.GetValueOrDefault());
+
+            return result;
+        }
+
+        private void AttemptHardClean(DTE dte)
+        {
+            if (this.forceCleanCheckBox.IsChecked.GetValueOrDefault() && !string.IsNullOrWhiteSpace(dte?.Solution.FullName))
+            {
+                FileUtils.AttemptHardClean(dte);
+            }
+        }
+
+        private void StopDebugMode(DTE dte)
+        {
             try
             {
                 // Stop local VS debug
@@ -79,53 +144,20 @@ namespace ReallyStopDebugger.Controls
             {
                 // The command Debug.StopDebugging is not available
             }
+        }
 
-            #endregion
-
-            var result = ProcessHelper.KillProcesses(
-                this.CurrentPackage,
-                this.processDisplayDataGrid.ItemsSource.Cast<ProcessInfo>()
-                    .Where(p => p.IsSelected)
-                    .Select(_ => _.ProcessName)
-                    .ToList(),
-                this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault(),
-                this.processCriteriaRadioButton_children.IsChecked.GetValueOrDefault());
-
-            if (this.forceCleanCheckBox.IsChecked.GetValueOrDefault()
-                && !string.IsNullOrWhiteSpace(dte?.Solution.FullName))
+        private bool IsPackageStateInvalid()
+        {
+            if (this.CurrentPackage == null)
             {
-                FileUtils.AttemptHardClean(dte);
+                // The control is in a faulted state or was instantiated before the package initialization
+                this.StatusLabel.Content =
+                    $"{ReallyStopDebugger.Resources.InvalidInstanceError_1}{Environment.NewLine}{ReallyStopDebugger.Resources.InvalidInstanceError_2}";
+                this.StatusLabel.Foreground = Brushes.Red;
+
+                return true;
             }
-
-            #region UI update
-
-            string returnMessage;
-
-            switch (result)
-            {
-                case Constants.Processeskillsuccess:
-                    {
-                        returnMessage = "Processes killed.";
-                        this.StatusLabel.Foreground = Brushes.Green;
-                        break;
-                    }
-                case Constants.Processesnotfound:
-                    {
-                        returnMessage = "Could not find any matching processes.";
-                        this.StatusLabel.Foreground = Brushes.Orange;
-                        break;
-                    }
-                default:
-                    {
-                        returnMessage = "Could not close orphaned processes due to an error.";
-                        this.StatusLabel.Foreground = Brushes.Red;
-                        break;
-                    }
-            }
-
-            this.StatusLabel.Content = returnMessage;
-
-            #endregion
+            return false;
         }
 
         private void LoadChildProcessesButtonClick(object sender, RoutedEventArgs e)
@@ -204,25 +236,19 @@ namespace ReallyStopDebugger.Controls
         private void LoadProcessDependencies(IProgress<string> progress)
         {
             var childProcesses = LoadChildProcesses(progress);
-#if DEBUG
-
-            // TODO: Remove this on release
-            var processes = WindowsNative.GetCurrentUserProcesses();
-            childProcesses.AddRange(processes);
-#endif
             this.MapProcessResults(progress, childProcesses);
         }
 
         private static List<Process> LoadChildProcesses(IProgress<string> progress)
         {
-            progress.Report("Loading process dependencies");
+            progress.Report(ReallyStopDebugger.Resources.ProgressReport_1);
             var childProcesses = WindowsNative.GetChildProcesses(WindowsNative.GetCurrentProcess().SafeGetProcessId());
             return childProcesses;
         }
 
         private void MapProcessResults(IProgress<string> progress, List<Process> childProcesses)
         {
-            progress.Report("Mapping results to grid");
+            progress.Report(ReallyStopDebugger.Resources.ProgressReport_2);
             if (childProcesses.Any())
             {
                 var childProcessesInfo =
@@ -242,6 +268,7 @@ namespace ReallyStopDebugger.Controls
 
         private void ReallyStopDebuggerConfigLoaded(object sender, RoutedEventArgs e)
         {
+            this.AdjustWindowSize();
             this.StatusLabel.Content = string.Empty;
             this.LoadExtensionSettings();
         }
@@ -290,6 +317,24 @@ namespace ReallyStopDebugger.Controls
             splash.Top = screenCoordinates.Y + (this.MyToolWindow.Height / 2) - splash.Height;
         }
 
+        private void AdjustWindowSize()
+        {
+            var window = this.DTE.ActiveWindow;
+
+            for (int i = 1; i <= window.Collection.Count; i++)
+            {
+                var item = window.Collection.Item(i);
+
+                if (item.Caption.Equals(
+                    ReallyStopDebugger.Resources.ToolWindowTitle,
+                    StringComparison.InvariantCultureIgnoreCase))
+                {
+                    item.Height = (int)this.Height - 50;
+                    item.Width = (int)this.Width;
+                }
+            }
+        }
+
         private void SaveExtensionSettings()
         {
             if (this.SettingsManager != null)
@@ -304,10 +349,7 @@ namespace ReallyStopDebugger.Controls
 
                 var customProcesses = string.Join(
                     "\r\n",
-                    this.CustomProcesses.Select(_ => _.ProcessName)
-                        .Where(_ => !string.IsNullOrWhiteSpace(_))
-                        .Distinct()
-                        .ToList());
+                    this.GetCustomProcessNames());
 
                 userSettingsStore.SetString("ReallyStopDebugger", "CustomProcessList", customProcesses);
                 userSettingsStore.SetString(
@@ -323,6 +365,14 @@ namespace ReallyStopDebugger.Controls
                     "ChildProcessMatch",
                     this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
             }
+        }
+
+        private List<string> GetCustomProcessNames()
+        {
+            return this.CustomProcesses.Select(_ => _.ProcessName)
+                .Where(_ => !string.IsNullOrWhiteSpace(_))
+                .Distinct()
+                .ToList();
         }
 
         private void LoadExtensionSettings()
