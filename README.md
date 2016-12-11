@@ -17,7 +17,7 @@ The extension is supported by Visual Studio 2012, 2013 and 2015. Visual Studio '
 IMPORTANT: If you are updating from version 0.9, you might need to reinstall the extension to load properly (sorry for that!)
 
 ###Visual Studio '15'
-Compatibility for the new Visual Studio 15 is enabled and the extension seems to be fully compatible, altough older extensions may be disabled once the final release is launched
+Compatibility for the new Visual Studio 15 is enabled in the github releases (Visual Studio Marketplace doesn't allow it yet) and the extension seems to be fully compatible, altough older extensions may be disabled once the final release is launched
 If you decide to install the extension for this version, keep in mind the following:
 * The VSIX installer will give you a warning about compatibility, which can be ignored
 * Visual Studio will disable the extension by default, and once you restart after enabling it, an error message will appear saying that you might have to reinstall Visual Studio. Ignore it and restart Visual Studio again
