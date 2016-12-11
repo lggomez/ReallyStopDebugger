@@ -1,0 +1,73 @@
+v2.0
+	-Fix: Prevent handle leaks on hard crashes
+	-Fix: Code cleanup, avoid NRE's in several methods
+	-Fix: Control layout in the Config tool window
+	-Fix: Several bugs in the save and retrieval of extension settings
+	-Fix: Improved process handling that didn't catch exceptions on certain
+		scenarios
+	-Fix: Config tool window is now constant when it's shown up
+
+	-Change: Running processes that are matched now are separated from
+		the custom process name list
+	-Change: Removed VS 2013 solution and compatibility. Files are now grouped 
+		in a single VS 2015 project, using C# 6
+	-Change: Changed size of tool window control
+
+	-New: UI - Added DataGrids to replace the old input textbox. Processes 
+		now show additional information and may be selected from the new grid
+	-New: Loading screen when loading processes
+	-New: VS 15 support (Experimental, see README)
+	-New: Added custom icons
+	-New: Added Keyboard Shortcuts for both silent (Ctrl+D, Ctrl+D) and 
+		configuration (Ctrl+D, Ctrl+C) modes
+
+	-Known defect: In multiple display setups the config window may not show
+		in the same screen as the VS instance
+
+v1.3
+	-Fix: Force delete previous value retrieval
+	-Fix: Now the addin activation stops the build before targeting msbuild 
+		processes
+	-Change: Organized the parameter controls in a more effective way with
+		radiobuttons, now pairing by user and process criteria
+	-New: Option to target all processes or the running vs instance childen
+		only
+
+v1.2
+	-Fix: Improved exception handling on initialization
+	-Fix: Minor code fixes and cleanup
+	-New: Button to add the current VS instance children processes to the
+		name list
+
+v1.1.2
+	-Change: Config button caption to something less dramatic
+	-Fix: Control layout in the Config tool window. Now it should scale
+		better upon window resize (really!). Also fixed layout margins
+	-Fix: Minor code fixes and cleanup
+	-New: The code has been refactored into a core code base with 2 solutions
+		linked to it, one for Visual Studio 2013 (Update 5) and another for 
+		VS 2015
+		Development will be done in VS 2015, and the VS 2013 solution will be
+		used for compatibility testing purposes
+
+v1.1.1
+	-Fix: Control layout in the Config tool window.
+		
+v1.1
+	-New: Now you can kill processes belonging to current user only
+	-New: Force clean option added. This will try to forcefully delete /bin and /obj
+		directories on the current solution after debug is stopped
+	-Fix: Label colors on VS instances using the dark theme
+	-Fix: Control layout in the Config tool window. Now it should scale
+		better upon window resize
+	-Fix: Minor code fixes and cleanup
+
+v1.0.1
+	-Restored VS 2012 compatibility
+
+v1.0
+	-Fixed dependencies and package install targets
+	-Added release notes to package
+
+v0.9
+	-First public release

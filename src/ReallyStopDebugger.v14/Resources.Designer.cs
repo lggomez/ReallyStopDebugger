@@ -70,6 +70,208 @@ namespace ReallyStopDebugger {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        internal static string ErrorTitle {
+            get {
+                return ResourceManager.GetString("ErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exception: {0}{1}Inside {2}.MenuItemCallback().
+        /// </summary>
+        internal static string Exception_General {
+            get {
+                return ResourceManager.GetString("Exception_General", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exception: {0}{1}Inside {2}.MenuItemCallbackLite().
+        /// </summary>
+        internal static string Exception_General_Lite {
+            get {
+                return ResourceManager.GetString("Exception_General_Lite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visual Studio instance not found..
+        /// </summary>
+        internal static string InvalidInstanceError_1 {
+            get {
+                return ResourceManager.GetString("InvalidInstanceError_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please reopen this window and try again.
+        /// </summary>
+        internal static string InvalidInstanceError_2 {
+            get {
+                return ResourceManager.GetString("InvalidInstanceError_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not close orphaned processes due to an error..
+        /// </summary>
+        internal static string ProcessesDefaultMessage {
+            get {
+                return ResourceManager.GetString("ProcessesDefaultMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ReallyStopDebugger&gt;------ Could not close orphaned processes due to an error..
+        /// </summary>
+        internal static string ProcessesDefaultMessageLite {
+            get {
+                return ResourceManager.GetString("ProcessesDefaultMessageLite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Processes killed..
+        /// </summary>
+        internal static string ProcesseskillsuccessMessage {
+            get {
+                return ResourceManager.GetString("ProcesseskillsuccessMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ReallyStopDebugger&gt;------ Processes killed..
+        /// </summary>
+        internal static string ProcesseskillsuccessMessageLite {
+            get {
+                return ResourceManager.GetString("ProcesseskillsuccessMessageLite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find any matching processes..
+        /// </summary>
+        internal static string ProcessesnotfoundMessage {
+            get {
+                return ResourceManager.GetString("ProcessesnotfoundMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ReallyStopDebugger&gt;------ Could not find any matching processes..
+        /// </summary>
+        internal static string ProcessesnotfoundMessageLite {
+            get {
+                return ResourceManager.GetString("ProcessesnotfoundMessageLite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An exception has occurred: .
+        /// </summary>
+        internal static string ProcessKillError_General {
+            get {
+                return ResourceManager.GetString("ProcessKillError_General", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The process has already exited or was not found..
+        /// </summary>
+        internal static string ProcessKillError_InvalidOperation {
+            get {
+                return ResourceManager.GetString("ProcessKillError_InvalidOperation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot kill a process running on a remote computer. Aborting..
+        /// </summary>
+        internal static string ProcessKillError_NotSupported {
+            get {
+                return ResourceManager.GetString("ProcessKillError_NotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error killing process: .
+        /// </summary>
+        internal static string ProcessKillError_Prompt {
+            get {
+                return ResourceManager.GetString("ProcessKillError_Prompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The associated process could not be terminated, is terminating or is an invalid Win32 process..
+        /// </summary>
+        internal static string ProcessKillError_Win32 {
+            get {
+                return ResourceManager.GetString("ProcessKillError_Win32", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading process dependencies.
+        /// </summary>
+        internal static string ProgressReport_1 {
+            get {
+                return ResourceManager.GetString("ProgressReport_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mapping results to grid.
+        /// </summary>
+        internal static string ProgressReport_2 {
+            get {
+                return ResourceManager.GetString("ProgressReport_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon reallystopDebugger16 {
+            get {
+                object obj = ResourceManager.GetObject("reallystopDebugger16", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon reallystopDebugger32 {
+            get {
+                object obj = ResourceManager.GetObject("reallystopDebugger32", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap reallystopDebugger48 {
+            get {
+                object obj = ResourceManager.GetObject("reallystopDebugger48", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon reallystopDebuggerIcons16 {
+            get {
+                object obj = ResourceManager.GetObject("reallystopDebuggerIcons16", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ReallyStopDebugger Config.
         /// </summary>
         internal static string ToolWindowTitle {

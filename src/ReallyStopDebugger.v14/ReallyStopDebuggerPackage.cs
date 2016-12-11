@@ -13,6 +13,8 @@ using System.ComponentModel.Design;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
+using ReallyStopDebugger.Controls;
+using ReallyStopDebugger.Native;
 
 namespace ReallyStopDebugger
 {
@@ -31,16 +33,23 @@ namespace ReallyStopDebugger
     // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is
     // a package.
     [PackageRegistration(UseManagedResourcesOnly = true)]
+
     // This attribute is used to register the information needed to show this package
     // in the Help/About dialog of Visual Studio.
-    [InstalledProductRegistration("#110", "#112", "1.3", IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", "2.0", IconResourceID = 400)]
+
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
+
     // This attribute registers a tool window exposed by this package.
     [ProvideToolWindow(typeof(ReallyStopDebuggerToolWindow))]
     [Guid(GuidList.guidReallyStopDebuggerPkgString)]
     public sealed class ReallyStopDebuggerPackage : Package
     {
+        private SettingsStore configurationSettingsStore;
+
+        private bool collectionExists;
+
         /// <summary>
         /// Default constructor of the package.
         /// Inside this method you can place any initialization code that does not require 
@@ -62,23 +71,21 @@ namespace ReallyStopDebugger
             // Get the instance number 0 of this tool window. This window is single instance so this instance
             // is actually the only one.
             // The last flag is set to true so that if the tool window does not exist it will be created.
-            ReallyStopDebuggerToolWindow window = FindToolWindow(typeof(ReallyStopDebuggerToolWindow), 0, true) as ReallyStopDebuggerToolWindow;
+            var toolWindow = this.FindToolWindow(typeof(ReallyStopDebuggerToolWindow), 0, true) as ReallyStopDebuggerToolWindow;
 
-            if ((null == window) || (null == window.Frame))
+            if (toolWindow?.Frame == null)
             {
                 throw new NotSupportedException(Resources.CanNotCreateWindow);
             }
-            else
-            {
-                window.currentPackage = this;
 
-                IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
+            var myControl = toolWindow.Content as MyControl;
+            var toolWindowFrame = toolWindow.Frame as IVsWindowFrame;
 
-                ((MyControl)window.Content).currentPackage = this;
-                ((MyControl)window.Content).settingsManager = new ShellSettingsManager(this);
+            myControl.CurrentPackage = this;
+            myControl.DTE = this.GetDte();
+            myControl.SettingsManager = new ShellSettingsManager(this);
 
-                ErrorHandler.ThrowOnFailure(windowFrame.Show());
-            }
+            ErrorHandler.ThrowOnFailure(toolWindowFrame.Show());
         }
 
         /////////////////////////////////////////////////////////////////////////////
@@ -94,22 +101,30 @@ namespace ReallyStopDebugger
             base.Initialize();
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
-            OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+            var mcs = this.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
 
             if (null != mcs)
             {
                 // Create the command for the cfg menu item.
-                CommandID menuCommandID = new CommandID(GuidList.guidReallyStopDebuggerCmdSet, (int)PkgCmdIDList.cmdidReallyStopDebugger);
-                MenuCommand menuItem = new MenuCommand(MenuItemCallback, menuCommandID );
-                mcs.AddCommand(menuItem);
+                var configWindowMenuItemCommandId = new CommandID(
+                                              GuidList.guidReallyStopDebuggerCmdSet,
+                                              (int)PkgCmdIDList.cmdidReallyStopDebugger);
+                var configWindowCallbackMenuCommand = new MenuCommand(this.MenuItemCallback, configWindowMenuItemCommandId);
+                mcs.AddCommand(configWindowCallbackMenuCommand);
+
                 // Create the command for the lite version menu item.
-                CommandID menuCommandID2 = new CommandID(GuidList.guidReallyStopDebuggerCmdSet, (int)PkgCmdIDList.cmdidReallyStopDebuggerLite);
-                MenuCommand menuItem2 = new MenuCommand(MenuItemCallbackLite, menuCommandID2);
-                mcs.AddCommand(menuItem2);
+                var liteVerMenuItemCommandId = new CommandID(
+                                               GuidList.guidReallyStopDebuggerCmdSet,
+                                               (int)PkgCmdIDList.cmdidReallyStopDebuggerLite);
+                var liteVerMenuCommand = new MenuCommand(this.MenuItemCallbackLite, liteVerMenuItemCommandId);
+                mcs.AddCommand(liteVerMenuCommand);
+
                 // Create the command for the tool window
-                CommandID toolwndCommandID = new CommandID(GuidList.guidReallyStopDebuggerCmdSet, (int)PkgCmdIDList.cmdidReallyStopDebuggerCfg);
-                MenuCommand menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
-                mcs.AddCommand(menuToolWin);
+                var configWindowMenuCommandId = new CommandID(
+                                                 GuidList.guidReallyStopDebuggerCmdSet,
+                                                 (int)PkgCmdIDList.cmdidReallyStopDebuggerCfg);
+                var configWindowMenuCommand = new MenuCommand(this.ShowToolWindow, configWindowMenuCommandId);
+                mcs.AddCommand(configWindowMenuCommand);
             }
         }
         #endregion
@@ -120,7 +135,7 @@ namespace ReallyStopDebugger
         /// <returns>The DTE instance, or null if no instance could be resolved</returns>
         public DTE GetDte()
         {
-            return (DTE)GetService(typeof(DTE));
+            return (DTE)this.GetService(typeof(DTE));
         }
 
         /// <summary>
@@ -132,13 +147,13 @@ namespace ReallyStopDebugger
         {
             try
             {
-                ShowToolWindow(sender, e);
+                this.ShowToolWindow(sender, e);
             }
             catch (Exception ex)
             {
                 this.ShowErrorMessage(
-                    string.Format(CultureInfo.CurrentCulture, "Exception: {0}{1}Inside {0}.MenuItemCallback()", ex.Message, Environment.NewLine),
-                    "Error");
+                    string.Format(CultureInfo.CurrentCulture, Resources.Exception_General, ex.Message, Environment.NewLine, this.GetType().Name),
+                    Resources.ErrorTitle);
             }
         }
 
@@ -149,93 +164,44 @@ namespace ReallyStopDebugger
         {
             try
             {
-                #region Stop debug mode
-                var dte = GetDte();
-                int result = -1;
+                this.LoadSettingsStore();
 
-                //Stop local VS debug/build
+                // Stop debug mode
+                var dte = this.GetDte();
+
+                // Stop local VS debug/build
                 dte.TryExecuteCommand("Debug.StopDebugging");
                 dte.TryExecuteCommand("Build.Cancel");
 
-                #endregion
-
-                #region Configuration retrieval & process killing
-
-                //Default values. These may be overriden upon configuration store retrieval
-                var filter = new string[] { "MSBuild", "WebDev.WebServer40", "Microsoft.VisualStudio.Web.Host" };
-
-                SettingsStore configurationSettingsStore = (new ShellSettingsManager(this)).GetReadOnlySettingsStore(SettingsScope.UserSettings);
-                bool collectionExists = configurationSettingsStore.CollectionExists("ReallyStopDebugger");
-
-                if (collectionExists)
-                {
-                    var filterByLocalUser = false;
-                    var filterByChildren = false;
-
-                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ProcessList"))
-                    {
-                        filter = (configurationSettingsStore.GetString("ReallyStopDebugger", "ProcessList") ?? string.Empty).Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-                    }
-
-                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "UserProcessMatch") )
-                    {
-                        filterByLocalUser = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "UserProcessMatch"));
-                    }
-
-                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ChildProcessMatch"))
-                    {
-                        filterByChildren = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "ChildProcessMatch"));
-                    }
-
-                    result = ProcessHelper.KillProcesses(this, filter.ToArray(), filterByLocalUser, filterByChildren, true);
-                    
-                }
-                else
-                {
-                    result = ProcessHelper.KillProcesses(this, filter.ToArray(), false, false, true);
-                }
-
-                #endregion
-
-                if (collectionExists)
-                {
-                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ForceClean"))
-                    {
-                        var forceClean = Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "ForceClean"));
-
-                        if (forceClean && !string.IsNullOrWhiteSpace(dte.Solution.FullName))
-                        {
-                            Common.FileUtils.AttemptHardClean(dte);
-                        }
-                    }
-                }
+                // Kill processes and attempt force clean (if needed)
+                var result = this.KillProcesses();
+                this.AttemptForceClean(dte);
 
                 #region Output window handling
 
                 string returnMessage;
 
                 // Find the output window.
-                Window window = GetDte().Windows.Item(Constants.vsWindowKindOutput);
-                OutputWindow outputWindow = (OutputWindow)window.Object;
+                var window = this.GetDte().Windows.Item(Constants.vsWindowKindOutput);
+                var outputWindow = (OutputWindow)window.Object;
 
-                OutputWindowPane owp;
-                owp = outputWindow.OutputWindowPanes.Add("Output");
+                var owp = outputWindow.OutputWindowPanes.Add("Output");
 
                 switch (result)
                 {
-                    case Common.Constants.PROCESSESKILLSUCCESS:
+                    case Common.Constants.Processeskillsuccess:
                         {
-                            returnMessage = "ReallyStopDebugger>------ Processes killed.";
+                            returnMessage = Resources.ProcesseskillsuccessMessageLite;
                             break;
                         }
-                    case Common.Constants.PROCESSESNOTFOUND:
+                    case Common.Constants.Processesnotfound:
                         {
-                            returnMessage = "ReallyStopDebugger>------ Could not find any matching processes.";
+                            returnMessage = Resources.ProcessesnotfoundMessageLite;
                             break;
                         }
                     default:
                         {
-                            returnMessage = "ReallyStopDebugger>------ Could not close orphaned processes due to an error.";
+                            returnMessage = Resources.ProcessesDefaultMessageLite;
                             break;
                         }
                 }
@@ -248,9 +214,75 @@ namespace ReallyStopDebugger
             catch (Exception ex)
             {
                 this.ShowErrorMessage(
-                    string.Format(CultureInfo.CurrentCulture, "Exception: {0}{1}Inside {0}.MenuItemCallbackLite()", ex.Message, Environment.NewLine),
-                    "Error");
+                    string.Format(CultureInfo.CurrentCulture, Resources.Exception_General_Lite, ex.Message, Environment.NewLine, this.GetType().Name),
+                    Resources.ErrorTitle);
             }
+        }
+
+        private void LoadSettingsStore()
+        {
+            this.configurationSettingsStore =
+                new ShellSettingsManager(this).GetReadOnlySettingsStore(SettingsScope.UserSettings);
+
+            this.collectionExists = this.configurationSettingsStore.CollectionExists("ReallyStopDebugger");
+        }
+
+        private void AttemptForceClean(DTE dte)
+        {
+            if (this.collectionExists)
+            {
+                if (this.configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ForceClean"))
+                {
+                    var forceClean = Convert.ToBoolean(this.configurationSettingsStore.GetString("ReallyStopDebugger", "ForceClean"));
+
+                    if (forceClean && !string.IsNullOrWhiteSpace(dte.Solution.FullName))
+                    {
+                        FileUtils.AttemptHardClean(dte);
+                    }
+                }
+            }
+        }
+
+        private int KillProcesses()
+        {
+            int result;
+
+            // Default values. These may be overriden upon configuration store retrieval
+            var filter = Common.Constants.DeafultFilter;
+
+            if (this.collectionExists)
+            {
+                var filterByLocalUser = false;
+                var filterByChildren = false;
+
+                if (this.configurationSettingsStore.PropertyExists("ReallyStopDebugger", "CustomProcessList"))
+                {
+                    filter =
+                        (this.configurationSettingsStore.GetString("ReallyStopDebugger", "CustomProcessList") ?? string.Empty).Split(
+                            new[] { "\r\n", "\n" },
+                            StringSplitOptions.None);
+                }
+
+                if (this.configurationSettingsStore.PropertyExists("ReallyStopDebugger", "UserProcessMatch"))
+                {
+                    filterByLocalUser =
+                        Convert.ToBoolean(this.configurationSettingsStore.GetString("ReallyStopDebugger", "UserProcessMatch"));
+                }
+
+                if (this.configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ChildProcessMatch"))
+                {
+                    filterByChildren =
+                        Convert.ToBoolean(this.configurationSettingsStore.GetString("ReallyStopDebugger", "ChildProcessMatch"));
+                }
+
+                result = ProcessHelper.KillProcesses(this, filter.ToArray(), filterByLocalUser, filterByChildren, true);
+            }
+            else
+            {
+                result = ProcessHelper.KillProcesses(this, filter.ToArray(), false, false, true);
+            }
+
+            return result;
         }
     }
 }
