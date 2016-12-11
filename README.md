@@ -1,6 +1,10 @@
 # ReallyStopDebugger
 General purpose process and debug killer for Visual Studio
 
+<p align="center">
+  <img src="https://github.com/lggomez/ReallyStopDebugger/blob/master/reallystopdebugger%20demo.png" alt="ReallyStopDebugger window" height="400"/>
+</p>
+
 ## What is it (really)?
 ReallyStopDebugger is a simple Visual Studio extension which allows to stop debugging and kill processes quickly.
 
