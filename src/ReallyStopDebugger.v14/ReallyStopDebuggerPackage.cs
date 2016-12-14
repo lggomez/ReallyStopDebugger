@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell.Settings;
 using System;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -68,22 +69,31 @@ namespace ReallyStopDebugger
         /// </summary>
         private void ShowToolWindow(object sender, EventArgs e)
         {
-            // Get the instance number 0 of this tool window. This window is single instance so this instance
-            // is actually the only one.
-            // The last flag is set to true so that if the tool window does not exist it will be created.
-            var toolWindow = this.FindToolWindow(typeof(ReallyStopDebuggerToolWindow), 0, true) as ReallyStopDebuggerToolWindow;
+            IVsWindowFrame toolWindowFrame = null;
 
-            if (toolWindow?.Frame == null)
+            try
             {
-                throw new NotSupportedException(Resources.CanNotCreateWindow);
+                // Get the instance number 0 of this tool window. This window is single instance so this instance
+                // is actually the only one.
+                // The last flag is set to true so that if the tool window does not exist it will be created.
+                var toolWindow = this.FindToolWindow(typeof(ReallyStopDebuggerToolWindow), 0, true) as ReallyStopDebuggerToolWindow;
+
+                if (toolWindow?.Frame == null)
+                {
+                    throw new NotSupportedException(Resources.CanNotCreateWindow);
+                }
+
+                var myControl = toolWindow.Content as MyControl;
+                toolWindowFrame = toolWindow.Frame as IVsWindowFrame;
+
+                myControl.CurrentPackage = this;
+                myControl.DTE = this.GetDte();
+                myControl.SettingsManager = new ShellSettingsManager(this);
             }
-
-            var myControl = toolWindow.Content as MyControl;
-            var toolWindowFrame = toolWindow.Frame as IVsWindowFrame;
-
-            myControl.CurrentPackage = this;
-            myControl.DTE = this.GetDte();
-            myControl.SettingsManager = new ShellSettingsManager(this);
+            catch (Exception ex)
+            {
+                this.ShowErrorMessage($"{Resources.ToolWindowInitFail}({sender.GetType().Name}){ex}{Environment.NewLine}{ex.StackTrace}", Resources.ErrorTitle);
+            }
 
             ErrorHandler.ThrowOnFailure(toolWindowFrame.Show());
         }
@@ -100,33 +110,56 @@ namespace ReallyStopDebugger
         {
             base.Initialize();
 
+            this.RegisterCommandHandlers();
+        }
+
+        private void RegisterCommandHandlers()
+        {
             // Add our command handlers for menu (commands must exist in the .vsct file)
-            var mcs = this.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+            var commandService = this.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
 
-            if (null != mcs)
+            if (null != commandService)
             {
-                // Create the command for the cfg menu item.
-                var configWindowMenuItemCommandId = new CommandID(
-                                              GuidList.guidReallyStopDebuggerCmdSet,
-                                              (int)PkgCmdIDList.cmdidReallyStopDebugger);
-                var configWindowCallbackMenuCommand = new MenuCommand(this.MenuItemCallback, configWindowMenuItemCommandId);
-                mcs.AddCommand(configWindowCallbackMenuCommand);
-
-                // Create the command for the lite version menu item.
-                var liteVerMenuItemCommandId = new CommandID(
-                                               GuidList.guidReallyStopDebuggerCmdSet,
-                                               (int)PkgCmdIDList.cmdidReallyStopDebuggerLite);
-                var liteVerMenuCommand = new MenuCommand(this.MenuItemCallbackLite, liteVerMenuItemCommandId);
-                mcs.AddCommand(liteVerMenuCommand);
-
-                // Create the command for the tool window
-                var configWindowMenuCommandId = new CommandID(
-                                                 GuidList.guidReallyStopDebuggerCmdSet,
-                                                 (int)PkgCmdIDList.cmdidReallyStopDebuggerCfg);
-                var configWindowMenuCommand = new MenuCommand(this.ShowToolWindow, configWindowMenuCommandId);
-                mcs.AddCommand(configWindowMenuCommand);
+                this.RegisterMainMenuCommand(commandService);
+                this.RegisterSilentModeCommand(commandService);
+            }
+            else
+            {
+                this.ShowErrorMessage(Resources.CommandServiceFail, Resources.ErrorTitle);
             }
         }
+
+        private void RegisterCommand(
+            OleMenuCommandService commandService,
+            Guid menuCommandGroupGuid,
+            int commandIdNumber,
+            EventHandler handler)
+        {
+            var commandId = new CommandID(menuCommandGroupGuid, commandIdNumber);
+            var menuCommand = new MenuCommand(handler, commandId);
+
+            if (commandService.FindCommand(commandId) != null)
+            {
+                commandService.RemoveCommand(menuCommand); //Is this step needed?
+            }
+
+            commandService.AddCommand(menuCommand);
+
+            Debug.WriteLine($"Registered command {nameof(commandService)}: {menuCommandGroupGuid} - {commandIdNumber}");
+        }
+
+        private void RegisterMainMenuCommand(OleMenuCommandService commandService)
+        {
+            // Create the command for the cfg menu item.
+            this.RegisterCommand(commandService, GuidList.guidReallyStopDebuggerCmdSet, (int)PkgCmdIDList.cmdidReallyStopDebugger, this.MenuItemCallback);
+        }
+
+        private void RegisterSilentModeCommand(OleMenuCommandService commandService)
+        {
+            // Create the command for the lite version menu item.
+            this.RegisterCommand(commandService, GuidList.guidReallyStopDebuggerCmdSet, (int)PkgCmdIDList.cmdidReallyStopDebuggerLite, this.MenuItemCallbackLite);
+        }
+
         #endregion
 
         /// <summary>
@@ -177,39 +210,7 @@ namespace ReallyStopDebugger
                 var result = this.KillProcesses();
                 this.AttemptForceClean(dte);
 
-                #region Output window handling
-
-                string returnMessage;
-
-                // Find the output window.
-                var window = this.GetDte().Windows.Item(Constants.vsWindowKindOutput);
-                var outputWindow = (OutputWindow)window.Object;
-
-                var owp = outputWindow.OutputWindowPanes.Add("Output");
-
-                switch (result)
-                {
-                    case Common.Constants.Processeskillsuccess:
-                        {
-                            returnMessage = Resources.ProcesseskillsuccessMessageLite;
-                            break;
-                        }
-                    case Common.Constants.Processesnotfound:
-                        {
-                            returnMessage = Resources.ProcessesnotfoundMessageLite;
-                            break;
-                        }
-                    default:
-                        {
-                            returnMessage = Resources.ProcessesDefaultMessageLite;
-                            break;
-                        }
-                }
-
-                owp.Activate();
-                owp.OutputString(returnMessage);
-
-                #endregion
+                this.SendResultToOutputWindow(result);
             }
             catch (Exception ex)
             {
@@ -217,6 +218,39 @@ namespace ReallyStopDebugger
                     string.Format(CultureInfo.CurrentCulture, Resources.Exception_General_Lite, ex.Message, Environment.NewLine, this.GetType().Name),
                     Resources.ErrorTitle);
             }
+        }
+
+        private void SendResultToOutputWindow(int result)
+        {
+            string returnMessage;
+
+            // Find the output window.
+            var window = this.GetDte().Windows.Item(Constants.vsWindowKindOutput);
+            var outputWindow = (OutputWindow)window.Object;
+
+            var owp = outputWindow.OutputWindowPanes.Add("Output");
+
+            switch (result)
+            {
+                case Common.Constants.Processeskillsuccess:
+                    {
+                        returnMessage = Resources.ProcesseskillsuccessMessageLite;
+                        break;
+                    }
+                case Common.Constants.Processesnotfound:
+                    {
+                        returnMessage = Resources.ProcessesnotfoundMessageLite;
+                        break;
+                    }
+                default:
+                    {
+                        returnMessage = Resources.ProcessesDefaultMessageLite;
+                        break;
+                    }
+            }
+
+            owp.Activate();
+            owp.OutputString(returnMessage);
         }
 
         private void LoadSettingsStore()

@@ -17,11 +17,13 @@ using Microsoft.VisualStudio.Shell;
 
 using ReallyStopDebugger.Common;
 using ReallyStopDebugger.Native;
+// ReSharper disable All
 
 namespace ReallyStopDebugger.Controls
 {
     using Constants = Common.Constants;
     using Process = System.Diagnostics.Process;
+    using StackFrame = System.Diagnostics.StackFrame;
 
     /// <summary>
     /// Interaction logic for MyControl.xaml
@@ -65,6 +67,7 @@ namespace ReallyStopDebugger.Controls
         private void KillProcessesButtonClick(object sender, RoutedEventArgs e)
         {
             if (this.IsPackageStateInvalid()) return;
+
             this.StatusLabel.Content = string.Empty;
             var dte = ((ReallyStopDebuggerPackage)this.CurrentPackage).GetDte();
 
@@ -199,14 +202,17 @@ namespace ReallyStopDebugger.Controls
                 {
                     this.CustomProcesses.RemoveAt(e.Row.GetIndex());
                 }
-
-                // NOTE: calling .RemoveAll can cause a ArgumentOutOfRangeException 
-                // in the RefreshCustomProcessDisplayDataGrid null assignment. Possible compiler bug?
-                this.CustomProcesses =
-                    this.CustomProcesses.Where(_ => !string.IsNullOrWhiteSpace(_.ProcessName)).ToList();
-                this.RefreshCustomProcessDisplayDataGrid();
             }
 
+            // NOTE: calling .RemoveAll will cause a ArgumentOutOfRangeException 
+            // in the RefreshCustomProcessDisplayDataGrid null assignment. This is related to
+            // the datasource binding events in the wpf datagrid control
+            this.CustomProcesses = this.CustomProcesses
+                .Where(_ => !string.IsNullOrWhiteSpace(_.ProcessName))
+                .GroupBy(_ => _.ProcessName)
+                .Select(g => g.First())
+                .ToList();
+            this.RefreshCustomProcessDisplayDataGrid();
             this.ResetCustomProcessDisplayDataGridFocus();
         }
 
@@ -319,20 +325,35 @@ namespace ReallyStopDebugger.Controls
 
         private void AdjustWindowSize()
         {
-            var window = this.DTE.ActiveWindow;
-
-            for (int i = 1; i <= window.Collection.Count; i++)
+            try
             {
-                var item = window.Collection.Item(i);
+                var window = this.DTE.ActiveWindow;
 
-                if (item.Caption.Equals(
-                    ReallyStopDebugger.Resources.ToolWindowTitle,
-                    StringComparison.InvariantCultureIgnoreCase))
+                for (int i = 1; i <= window.Collection.Count; i++)
                 {
-                    item.Height = (int)this.Height - 50;
-                    item.Width = (int)this.Width;
+                    var item = window.Collection.Item(i);
+
+                    if (item.Caption.Equals(
+                        ReallyStopDebugger.Resources.ToolWindowTitle,
+                        StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        item.Height = (int)this.Height - 50;
+                        item.Width = (int)this.Width;
+                    }
                 }
             }
+            catch
+            {
+                // We don't want to interrupt window initialization in case of failure
+            }
+        }
+
+        private List<string> GetCustomProcessNames()
+        {
+            return this.CustomProcesses.Select(_ => _.ProcessName)
+                .Where(_ => !string.IsNullOrWhiteSpace(_))
+                .Distinct()
+                .ToList();
         }
 
         private void SaveExtensionSettings()
@@ -347,9 +368,7 @@ namespace ReallyStopDebugger.Controls
                     userSettingsStore.CreateCollection("ReallyStopDebugger");
                 }
 
-                var customProcesses = string.Join(
-                    "\r\n",
-                    this.GetCustomProcessNames());
+                var customProcesses = string.Join("\r\n", this.GetCustomProcessNames());
 
                 userSettingsStore.SetString("ReallyStopDebugger", "CustomProcessList", customProcesses);
                 userSettingsStore.SetString(
@@ -365,14 +384,11 @@ namespace ReallyStopDebugger.Controls
                     "ChildProcessMatch",
                     this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
             }
-        }
-
-        private List<string> GetCustomProcessNames()
-        {
-            return this.CustomProcesses.Select(_ => _.ProcessName)
-                .Where(_ => !string.IsNullOrWhiteSpace(_))
-                .Distinct()
-                .ToList();
+            else
+            {
+                Console.WriteLine(
+                    $"{ReallyStopDebugger.Resources.SettingsManagerNotFound} at {new StackFrame().GetMethod().Name}");
+            }
         }
 
         private void LoadExtensionSettings()
@@ -421,6 +437,11 @@ namespace ReallyStopDebugger.Controls
                                 configurationSettingsStore.GetString("ReallyStopDebugger", "ChildProcessMatch"));
                     }
                 }
+            }
+            else
+            {
+                Console.WriteLine(
+                    $"{ReallyStopDebugger.Resources.SettingsManagerNotFound} at {new StackFrame().GetMethod().Name}");
             }
         }
 

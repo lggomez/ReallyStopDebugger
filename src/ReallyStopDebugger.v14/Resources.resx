@@ -190,4 +190,13 @@
   <data name="ProcessKillError_Win32" xml:space="preserve">
     <value>The associated process could not be terminated, is terminating or is an invalid Win32 process.</value>
   </data>
+  <data name="SettingsManagerNotFound" xml:space="preserve">
+    <value>Could not find settings manager</value>
+  </data>
+  <data name="CommandServiceFail" xml:space="preserve">
+    <value>Could not resolve IMenuCommandService</value>
+  </data>
+  <data name="ToolWindowInitFail" xml:space="preserve">
+    <value>ToolWindow initialization failed: </value>
+  </data>
 </root>

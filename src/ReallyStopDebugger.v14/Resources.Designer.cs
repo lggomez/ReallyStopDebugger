@@ -70,6 +70,15 @@ namespace ReallyStopDebugger {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not resolve IMenuCommandService.
+        /// </summary>
+        internal static string CommandServiceFail {
+            get {
+                return ResourceManager.GetString("CommandServiceFail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         internal static string ErrorTitle {
@@ -268,6 +277,24 @@ namespace ReallyStopDebugger {
             get {
                 object obj = ResourceManager.GetObject("reallystopDebuggerIcons16", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find settings manager.
+        /// </summary>
+        internal static string SettingsManagerNotFound {
+            get {
+                return ResourceManager.GetString("SettingsManagerNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ToolWindow initialization failed: .
+        /// </summary>
+        internal static string ToolWindowInitFail {
+            get {
+                return ResourceManager.GetString("ToolWindowInitFail", resourceCulture);
             }
         }
         
