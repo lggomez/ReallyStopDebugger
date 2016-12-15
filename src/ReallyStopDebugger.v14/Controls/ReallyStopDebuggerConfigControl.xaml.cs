@@ -204,16 +204,18 @@ namespace ReallyStopDebugger.Controls
                 }
             }
 
-            // NOTE: calling .RemoveAll will cause a ArgumentOutOfRangeException 
-            // in the RefreshCustomProcessDisplayDataGrid null assignment. This is related to
-            // the datasource binding events in the wpf datagrid control
-            this.CustomProcesses = this.CustomProcesses
-                .Where(_ => !string.IsNullOrWhiteSpace(_.ProcessName))
-                .GroupBy(_ => _.ProcessName)
-                .Select(g => g.First())
-                .ToList();
+            this.UpdateCustomProcesses(null, true);
             this.RefreshCustomProcessDisplayDataGrid();
             this.ResetCustomProcessDisplayDataGridFocus();
+        }
+
+        private void ProcessCustomDisplayDataGrid_OnSelected(object sender, RoutedEventArgs e)
+        {
+            if (e.OriginalSource.GetType() == typeof(DataGridCell))
+            {
+                DataGrid grid = (DataGrid)sender;
+                grid.BeginEdit(e);
+            }
         }
 
         #endregion
@@ -255,6 +257,7 @@ namespace ReallyStopDebugger.Controls
         private void MapProcessResults(IProgress<string> progress, List<Process> childProcesses)
         {
             progress.Report(ReallyStopDebugger.Resources.ProgressReport_2);
+
             if (childProcesses.Any())
             {
                 var childProcessesInfo =
@@ -352,7 +355,6 @@ namespace ReallyStopDebugger.Controls
         {
             return this.CustomProcesses.Select(_ => _.ProcessName)
                 .Where(_ => !string.IsNullOrWhiteSpace(_))
-                .Distinct()
                 .ToList();
         }
 
@@ -409,11 +411,10 @@ namespace ReallyStopDebugger.Controls
                         var propertyValue = configurationSettingsStore.GetString(
                                                 Constants.CollectionPath,
                                                 Constants.CustomProcessesProperty) ?? string.Empty;
-                        customProcesses =
+                        customProcesses.AddRange(
                             propertyValue.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)
-                                .Distinct()
                                 .Select(_ => new CustomProcessInfo(_))
-                                .ToList();
+                                .ToList());
                     }
 
                     if (configurationSettingsStore.PropertyExists(Constants.CollectionPath, Constants.ForceCleanProperty))
@@ -443,9 +444,30 @@ namespace ReallyStopDebugger.Controls
                     $"{ReallyStopDebugger.Resources.SettingsManagerNotFound} at {new StackFrame().GetMethod().Name}");
             }
 
-            this.CustomProcesses.Clear();
-            this.CustomProcesses.AddRange(customProcesses);
+            this.UpdateCustomProcesses(customProcesses, true);
             this.RefreshCustomProcessDisplayDataGrid();
+        }
+
+        private void UpdateCustomProcesses(List<CustomProcessInfo> processInfoList, bool? replaceAll = false)
+        {
+            // Calling .RemoveAll, .Clear or related method will cause a ArgumentOutOfRangeException 
+            // in the RefreshCustomProcessDisplayDataGrid null assignment due to
+            // the datasource binding events in the wpf datagrid control
+
+            CustomProcessInfo[] copy = new CustomProcessInfo[this.CustomProcesses.Count];
+            this.CustomProcesses.CopyTo(copy);
+            var target = copy.Where(_ => !string.IsNullOrWhiteSpace(_.ProcessName))
+                .Distinct()
+                .GroupBy(_ => _.ProcessName)
+                .Select(g => g.First())
+                .ToList();
+
+            if (!replaceAll.GetValueOrDefault() && (processInfoList != null))
+            {
+                target.AddRange(processInfoList);
+            }
+
+            this.CustomProcesses = target;
         }
 
         #endregion

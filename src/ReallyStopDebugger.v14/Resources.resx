@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CanNotCreateWindow" xml:space="preserve">
-    <value>Can not create tool window.</value>
+    <value>Can not create tool window</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="reallystopDebugger16" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -146,28 +146,28 @@
     <value>Exception: {0}{1}Inside {2}.MenuItemCallbackLite()</value>
   </data>
   <data name="InvalidInstanceError_1" xml:space="preserve">
-    <value>Visual Studio instance not found.</value>
+    <value>Visual Studio instance not found. Please close this window and try again</value>
   </data>
   <data name="InvalidInstanceError_2" xml:space="preserve">
     <value>Please reopen this window and try again</value>
   </data>
   <data name="ProcessesDefaultMessage" xml:space="preserve">
-    <value>Could not close orphaned processes due to an error.</value>
+    <value>Could not kill child processes due to an error</value>
   </data>
   <data name="ProcessesDefaultMessageLite" xml:space="preserve">
-    <value>ReallyStopDebugger&gt;------ Could not close orphaned processes due to an error.</value>
+    <value>ReallyStopDebugger&gt;------ Could not kill child processes due to an error</value>
   </data>
   <data name="ProcesseskillsuccessMessage" xml:space="preserve">
     <value>Processes killed.</value>
   </data>
   <data name="ProcesseskillsuccessMessageLite" xml:space="preserve">
-    <value>ReallyStopDebugger&gt;------ Processes killed.</value>
+    <value>ReallyStopDebugger&gt;------ Processes killed</value>
   </data>
   <data name="ProcessesnotfoundMessage" xml:space="preserve">
-    <value>Could not find any matching processes.</value>
+    <value>Could not find any matching processes</value>
   </data>
   <data name="ProcessesnotfoundMessageLite" xml:space="preserve">
-    <value>ReallyStopDebugger&gt;------ Could not find any matching processes.</value>
+    <value>ReallyStopDebugger&gt;------ Could not find any matching processes</value>
   </data>
   <data name="ProgressReport_1" xml:space="preserve">
     <value>Loading process dependencies</value>
@@ -179,16 +179,16 @@
     <value>An exception has occurred: </value>
   </data>
   <data name="ProcessKillError_InvalidOperation" xml:space="preserve">
-    <value>The process has already exited or was not found.</value>
+    <value>The process has already exited or was not found</value>
   </data>
   <data name="ProcessKillError_NotSupported" xml:space="preserve">
-    <value>Cannot kill a process running on a remote computer. Aborting.</value>
+    <value>Cannot kill a process running on a remote computer. Aborting</value>
   </data>
   <data name="ProcessKillError_Prompt" xml:space="preserve">
     <value>Error killing process: </value>
   </data>
   <data name="ProcessKillError_Win32" xml:space="preserve">
-    <value>The associated process could not be terminated, is terminating or is an invalid Win32 process.</value>
+    <value>The associated process could not be terminated, is terminating or is an invalid Win32 process</value>
   </data>
   <data name="SettingsManagerNotFound" xml:space="preserve">
     <value>Could not find settings manager</value>

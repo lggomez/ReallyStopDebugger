@@ -61,7 +61,7 @@ namespace ReallyStopDebugger {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Can not create tool window..
+        ///   Looks up a localized string similar to Can not create tool window.
         /// </summary>
         internal static string CanNotCreateWindow {
             get {
@@ -106,7 +106,7 @@ namespace ReallyStopDebugger {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Visual Studio instance not found..
+        ///   Looks up a localized string similar to Visual Studio instance not found. Please close this window and try again.
         /// </summary>
         internal static string InvalidInstanceError_1 {
             get {
@@ -124,7 +124,7 @@ namespace ReallyStopDebugger {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not close orphaned processes due to an error..
+        ///   Looks up a localized string similar to Could not kill child processes due to an error.
         /// </summary>
         internal static string ProcessesDefaultMessage {
             get {
@@ -133,7 +133,7 @@ namespace ReallyStopDebugger {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ReallyStopDebugger&gt;------ Could not close orphaned processes due to an error..
+        ///   Looks up a localized string similar to ReallyStopDebugger&gt;------ Could not kill child processes due to an error.
         /// </summary>
         internal static string ProcessesDefaultMessageLite {
             get {
@@ -151,7 +151,7 @@ namespace ReallyStopDebugger {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ReallyStopDebugger&gt;------ Processes killed..
+        ///   Looks up a localized string similar to ReallyStopDebugger&gt;------ Processes killed.
         /// </summary>
         internal static string ProcesseskillsuccessMessageLite {
             get {
@@ -160,7 +160,7 @@ namespace ReallyStopDebugger {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not find any matching processes..
+        ///   Looks up a localized string similar to Could not find any matching processes.
         /// </summary>
         internal static string ProcessesnotfoundMessage {
             get {
@@ -169,7 +169,7 @@ namespace ReallyStopDebugger {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ReallyStopDebugger&gt;------ Could not find any matching processes..
+        ///   Looks up a localized string similar to ReallyStopDebugger&gt;------ Could not find any matching processes.
         /// </summary>
         internal static string ProcessesnotfoundMessageLite {
             get {
@@ -187,7 +187,7 @@ namespace ReallyStopDebugger {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The process has already exited or was not found..
+        ///   Looks up a localized string similar to The process has already exited or was not found.
         /// </summary>
         internal static string ProcessKillError_InvalidOperation {
             get {
@@ -196,7 +196,7 @@ namespace ReallyStopDebugger {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot kill a process running on a remote computer. Aborting..
+        ///   Looks up a localized string similar to Cannot kill a process running on a remote computer. Aborting.
         /// </summary>
         internal static string ProcessKillError_NotSupported {
             get {
@@ -214,7 +214,7 @@ namespace ReallyStopDebugger {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The associated process could not be terminated, is terminating or is an invalid Win32 process..
+        ///   Looks up a localized string similar to The associated process could not be terminated, is terminating or is an invalid Win32 process.
         /// </summary>
         internal static string ProcessKillError_Win32 {
             get {

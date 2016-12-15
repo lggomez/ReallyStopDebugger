@@ -202,3 +202,4 @@ src/ReallyStopDebugger/Key.snk
 # experimental instance
 !src/ReallyStopDebugger.v12/ReallyStopDebugger.v12.csproj.user
 !src/ReallyStopDebugger.v14/ReallyStopDebugger.v14.csproj.user
+src/ReallyStopDebugger.v14/DebugBinaries/
