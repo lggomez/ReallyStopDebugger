@@ -19,6 +19,7 @@ namespace ReallyStopDebugger.Common
         {
             this.ResultCode = resultCode;
             this.InnerProcessException = innerException;
+            this.Message = message;
         }
 
         public override string ToString()

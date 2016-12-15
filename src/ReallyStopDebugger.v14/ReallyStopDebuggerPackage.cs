@@ -220,6 +220,72 @@ namespace ReallyStopDebugger
             }
         }
 
+        private void LoadSettingsStore()
+        {
+            this.configurationSettingsStore =
+                new ShellSettingsManager(this).GetReadOnlySettingsStore(SettingsScope.UserSettings);
+
+            this.collectionExists = this.configurationSettingsStore.CollectionExists(Common.Constants.CollectionPath);
+        }
+
+        private void AttemptForceClean(DTE dte)
+        {
+            if (this.collectionExists)
+            {
+                if (this.configurationSettingsStore.PropertyExists(Common.Constants.CollectionPath, Common.Constants.ForceCleanProperty))
+                {
+                    var forceClean = Convert.ToBoolean(this.configurationSettingsStore.GetString(Common.Constants.CollectionPath, Common.Constants.ForceCleanProperty));
+
+                    if (forceClean && !string.IsNullOrWhiteSpace(dte.Solution.FullName))
+                    {
+                        FileUtils.AttemptHardClean(dte);
+                    }
+                }
+            }
+        }
+
+        private ProcessOperationException KillProcesses()
+        {
+            ProcessOperationException result;
+
+            // Default values. These may be overriden upon configuration store retrieval
+            var filter = Common.Constants.DeafultFilter;
+
+            if (this.collectionExists)
+            {
+                var filterByLocalUser = false;
+                var filterByChildren = false;
+
+                if (this.configurationSettingsStore.PropertyExists(Common.Constants.CollectionPath, Common.Constants.CustomProcessesProperty))
+                {
+                    filter =
+                        (this.configurationSettingsStore.GetString(Common.Constants.CollectionPath, Common.Constants.CustomProcessesProperty) ?? string.Empty).Split(
+                            new[] { "\r\n", "\n" },
+                            StringSplitOptions.None);
+                }
+
+                if (this.configurationSettingsStore.PropertyExists(Common.Constants.CollectionPath, Common.Constants.UserProcessMatchProperty))
+                {
+                    filterByLocalUser =
+                        Convert.ToBoolean(this.configurationSettingsStore.GetString(Common.Constants.CollectionPath, Common.Constants.UserProcessMatchProperty));
+                }
+
+                if (this.configurationSettingsStore.PropertyExists(Common.Constants.CollectionPath, Common.Constants.ChildProcessMatchProperty))
+                {
+                    filterByChildren =
+                        Convert.ToBoolean(this.configurationSettingsStore.GetString(Common.Constants.CollectionPath, Common.Constants.ChildProcessMatchProperty));
+                }
+
+                result = ProcessHelper.KillProcesses(this, filter.ToArray(), filterByLocalUser, filterByChildren, true);
+            }
+            else
+            {
+                result = ProcessHelper.KillProcesses(this, filter.ToArray(), false, false, true);
+            }
+
+            return result;
+        }
+
         private void SendResultToOutputWindow(ProcessOperationException result)
         {
             string returnMessage;
@@ -244,79 +310,15 @@ namespace ReallyStopDebugger
                     }
                 default:
                     {
-                        returnMessage = Resources.ProcessesDefaultMessageLite;
+                        returnMessage = result.IsFaulted
+                                            ? $"{Resources.ProcessesDefaultMessageLite}{Environment.NewLine}{result.InnerProcessException.Message}"
+                                            : Resources.ProcessesDefaultMessageLite;
                         break;
                     }
             }
 
             owp.Activate();
-            owp.OutputString(returnMessage);
-        }
-
-        private void LoadSettingsStore()
-        {
-            this.configurationSettingsStore =
-                new ShellSettingsManager(this).GetReadOnlySettingsStore(SettingsScope.UserSettings);
-
-            this.collectionExists = this.configurationSettingsStore.CollectionExists("ReallyStopDebugger");
-        }
-
-        private void AttemptForceClean(DTE dte)
-        {
-            if (this.collectionExists)
-            {
-                if (this.configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ForceClean"))
-                {
-                    var forceClean = Convert.ToBoolean(this.configurationSettingsStore.GetString("ReallyStopDebugger", "ForceClean"));
-
-                    if (forceClean && !string.IsNullOrWhiteSpace(dte.Solution.FullName))
-                    {
-                        FileUtils.AttemptHardClean(dte);
-                    }
-                }
-            }
-        }
-
-        private ProcessOperationException KillProcesses()
-        {
-            ProcessOperationException result;
-
-            // Default values. These may be overriden upon configuration store retrieval
-            var filter = Common.Constants.DeafultFilter;
-
-            if (this.collectionExists)
-            {
-                var filterByLocalUser = false;
-                var filterByChildren = false;
-
-                if (this.configurationSettingsStore.PropertyExists("ReallyStopDebugger", "CustomProcessList"))
-                {
-                    filter =
-                        (this.configurationSettingsStore.GetString("ReallyStopDebugger", "CustomProcessList") ?? string.Empty).Split(
-                            new[] { "\r\n", "\n" },
-                            StringSplitOptions.None);
-                }
-
-                if (this.configurationSettingsStore.PropertyExists("ReallyStopDebugger", "UserProcessMatch"))
-                {
-                    filterByLocalUser =
-                        Convert.ToBoolean(this.configurationSettingsStore.GetString("ReallyStopDebugger", "UserProcessMatch"));
-                }
-
-                if (this.configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ChildProcessMatch"))
-                {
-                    filterByChildren =
-                        Convert.ToBoolean(this.configurationSettingsStore.GetString("ReallyStopDebugger", "ChildProcessMatch"));
-                }
-
-                result = ProcessHelper.KillProcesses(this, filter.ToArray(), filterByLocalUser, filterByChildren, true);
-            }
-            else
-            {
-                result = ProcessHelper.KillProcesses(this, filter.ToArray(), false, false, true);
-            }
-
-            return result;
+            owp.OutputString($"[{DateTime.Now:HH:mm:ss}] {returnMessage}");
         }
     }
 }

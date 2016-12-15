@@ -361,27 +361,27 @@ namespace ReallyStopDebugger.Controls
             if (this.SettingsManager != null)
             {
                 var userSettingsStore = this.SettingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
-                var collectionExists = userSettingsStore.CollectionExists("ReallyStopDebugger");
+                var collectionExists = userSettingsStore.CollectionExists(Constants.CollectionPath);
 
                 if (!collectionExists)
                 {
-                    userSettingsStore.CreateCollection("ReallyStopDebugger");
+                    userSettingsStore.CreateCollection(Constants.CollectionPath);
                 }
 
                 var customProcesses = string.Join("\r\n", this.GetCustomProcessNames());
 
-                userSettingsStore.SetString("ReallyStopDebugger", "CustomProcessList", customProcesses);
+                userSettingsStore.SetString(Constants.CollectionPath, Constants.CustomProcessesProperty, customProcesses);
                 userSettingsStore.SetString(
-                    "ReallyStopDebugger",
-                    "ForceClean",
+                    Constants.CollectionPath,
+                    Constants.ForceCleanProperty,
                     this.forceCleanCheckBox.IsChecked.GetValueOrDefault().ToString());
                 userSettingsStore.SetString(
-                    "ReallyStopDebugger",
-                    "UserProcessMatch",
+                    Constants.CollectionPath,
+                    Constants.UserProcessMatchProperty,
                     this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
                 userSettingsStore.SetString(
-                    "ReallyStopDebugger",
-                    "ChildProcessMatch",
+                    Constants.CollectionPath,
+                    Constants.ChildProcessMatchProperty,
                     this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
             }
             else
@@ -400,15 +400,15 @@ namespace ReallyStopDebugger.Controls
             {
                 var configurationSettingsStore =
                     this.SettingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
-                var collectionExists = configurationSettingsStore.CollectionExists("ReallyStopDebugger");
+                var collectionExists = configurationSettingsStore.CollectionExists(Constants.CollectionPath);
 
                 if (collectionExists)
                 {
-                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "CustomProcessList"))
+                    if (configurationSettingsStore.PropertyExists(Constants.CollectionPath, Constants.CustomProcessesProperty))
                     {
                         var propertyValue = configurationSettingsStore.GetString(
-                                                "ReallyStopDebugger",
-                                                "CustomProcessList") ?? string.Empty;
+                                                Constants.CollectionPath,
+                                                Constants.CustomProcessesProperty) ?? string.Empty;
                         customProcesses =
                             propertyValue.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)
                                 .Distinct()
@@ -416,24 +416,24 @@ namespace ReallyStopDebugger.Controls
                                 .ToList();
                     }
 
-                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ForceClean"))
+                    if (configurationSettingsStore.PropertyExists(Constants.CollectionPath, Constants.ForceCleanProperty))
                     {
                         this.forceCleanCheckBox.IsChecked =
-                            Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "ForceClean"));
+                            Convert.ToBoolean(configurationSettingsStore.GetString(Constants.CollectionPath, Constants.ForceCleanProperty));
                     }
 
-                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "UserProcessMatch"))
+                    if (configurationSettingsStore.PropertyExists(Constants.CollectionPath, Constants.UserProcessMatchProperty))
                     {
                         this.userCriteriaRadioButton_userOnly.IsChecked =
                             Convert.ToBoolean(
-                                configurationSettingsStore.GetString("ReallyStopDebugger", "UserProcessMatch"));
+                                configurationSettingsStore.GetString(Constants.CollectionPath, Constants.UserProcessMatchProperty));
                     }
 
-                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ChildProcessMatch"))
+                    if (configurationSettingsStore.PropertyExists(Constants.CollectionPath, Constants.ChildProcessMatchProperty))
                     {
                         this.userCriteriaRadioButton_userOnly.IsChecked =
                             Convert.ToBoolean(
-                                configurationSettingsStore.GetString("ReallyStopDebugger", "ChildProcessMatch"));
+                                configurationSettingsStore.GetString(Constants.CollectionPath, Constants.ChildProcessMatchProperty));
                     }
                 }
             }

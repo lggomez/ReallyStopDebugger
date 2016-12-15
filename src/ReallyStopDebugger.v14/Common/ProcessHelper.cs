@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Management.Instrumentation;
 
 using Microsoft.VisualStudio.Shell;
 
@@ -14,8 +15,6 @@ using ReallyStopDebugger.Native;
 
 namespace ReallyStopDebugger.Common
 {
-    using System.Management.Instrumentation;
-
     internal static class ProcessHelper
     {
         public static ProcessOperationException KillProcesses(
