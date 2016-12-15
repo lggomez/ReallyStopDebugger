@@ -155,6 +155,7 @@
     <Compile Include="Common\CustomProcessInfo.cs" />
     <Compile Include="Common\FileUtils.cs" />
     <Compile Include="Common\ProcessExtensions.cs" />
+    <Compile Include="Common\ProcessOperationException.cs" />
     <Compile Include="Controls\SplashWindow.xaml.cs">
       <DependentUpon>SplashWindow.xaml</DependentUpon>
     </Compile>

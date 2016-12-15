@@ -223,6 +223,15 @@ namespace ReallyStopDebugger {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Target processes not found.
+        /// </summary>
+        internal static string ProcessNotFoundExceptionMessage {
+            get {
+                return ResourceManager.GetString("ProcessNotFoundExceptionMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loading process dependencies.
         /// </summary>
         internal static string ProgressReport_1 {

@@ -196,6 +196,9 @@
   <data name="CommandServiceFail" xml:space="preserve">
     <value>Could not resolve IMenuCommandService</value>
   </data>
+  <data name="ProcessNotFoundExceptionMessage" xml:space="preserve">
+    <value>Target processes not found</value>
+  </data>
   <data name="ToolWindowInitFail" xml:space="preserve">
     <value>ToolWindow initialization failed: </value>
   </data>

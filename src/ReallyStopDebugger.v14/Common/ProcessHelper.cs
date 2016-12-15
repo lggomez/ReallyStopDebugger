@@ -14,9 +14,11 @@ using ReallyStopDebugger.Native;
 
 namespace ReallyStopDebugger.Common
 {
+    using System.Management.Instrumentation;
+
     internal static class ProcessHelper
     {
-        public static int KillProcesses(
+        public static ProcessOperationException KillProcesses(
             Package package,
             IList processNames,
             bool restrictUser,
@@ -46,7 +48,8 @@ namespace ReallyStopDebugger.Common
                         (from p in filteredProcesses join c in childProcesses on p.SafeGetProcessId() equals c.SafeGetProcessId() select p).ToList();
                 }
 
-                if (!filteredProcesses.Any()) return Constants.Processesnotfound;
+                if (!filteredProcesses.Any())
+                    return new ProcessOperationException(ProcessOperationResults.NotFound, new InstanceNotFoundException(Resources.ProcessNotFoundExceptionMessage));
 
                 foreach (var p in filteredProcesses)
                 {
@@ -54,7 +57,7 @@ namespace ReallyStopDebugger.Common
                     p.Kill();
                 }
             }
-            catch (Win32Exception)
+            catch (Win32Exception ex)
             {
                 if (!consoleMode)
                 {
@@ -62,9 +65,10 @@ namespace ReallyStopDebugger.Common
                         Resources.ProcessKillError_Win32,
                         Resources.ProcessKillError_Prompt + currentProcessName);
                 }
-                return Constants.Processeskillerror;
+
+                return new ProcessOperationException(ProcessOperationResults.Error, ex);
             }
-            catch (NotSupportedException)
+            catch (NotSupportedException ex)
             {
                 if (!consoleMode)
                 {
@@ -72,9 +76,10 @@ namespace ReallyStopDebugger.Common
                         Resources.ProcessKillError_NotSupported,
                         Resources.ProcessKillError_Prompt + currentProcessName);
                 }
-                return Constants.Processeskillerror;
+
+                return new ProcessOperationException(ProcessOperationResults.Error, ex);
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ex)
             {
                 if (!consoleMode)
                 {
@@ -82,7 +87,8 @@ namespace ReallyStopDebugger.Common
                         Resources.ProcessKillError_InvalidOperation,
                         Resources.ProcessKillError_Prompt + currentProcessName);
                 }
-                return Constants.Processeskillerror;
+
+                return new ProcessOperationException(ProcessOperationResults.Error, ex);
             }
             catch (Exception ex)
             {
@@ -92,10 +98,11 @@ namespace ReallyStopDebugger.Common
                         string.Format(Resources.ProcessKillError_General + ex.Message),
                         Resources.ProcessKillError_Prompt + currentProcessName);
                 }
-                return Constants.Processeskillerror;
+
+                return new ProcessOperationException(ProcessOperationResults.Error, ex);
             }
 
-            return Constants.Processeskillsuccess;
+            return new ProcessOperationException(ProcessOperationResults.Success, null);
         }
 
         public static string GetProcessPath(Process process)

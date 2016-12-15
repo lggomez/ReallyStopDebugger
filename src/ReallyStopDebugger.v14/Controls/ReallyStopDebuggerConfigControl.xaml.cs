@@ -80,19 +80,19 @@ namespace ReallyStopDebugger.Controls
             this.UpdateStatusFromResult(result);
         }
 
-        private void UpdateStatusFromResult(int result)
+        private void UpdateStatusFromResult(ProcessOperationException result)
         {
             string returnMessage;
 
-            switch (result)
+            switch (result.ResultCode)
             {
-                case Constants.Processeskillsuccess:
+                case ProcessOperationResults.Success:
                     {
                         returnMessage = ReallyStopDebugger.Resources.ProcesseskillsuccessMessage;
                         this.StatusLabel.Foreground = Brushes.Green;
                         break;
                     }
-                case Constants.Processesnotfound:
+                case ProcessOperationResults.NotFound:
                     {
                         returnMessage = ReallyStopDebugger.Resources.ProcessesnotfoundMessage;
                         this.StatusLabel.Foreground = Brushes.Orange;
@@ -109,7 +109,7 @@ namespace ReallyStopDebugger.Controls
             this.StatusLabel.Content = returnMessage;
         }
 
-        private int KillProcesses()
+        private ProcessOperationException KillProcesses()
         {
             var processNameList =
                 this.processDisplayDataGrid.ItemsSource.Cast<ProcessInfo>()
@@ -393,6 +393,9 @@ namespace ReallyStopDebugger.Controls
 
         private void LoadExtensionSettings()
         {
+            // Default values. These may be overriden upon configuration store retrieval
+            var customProcesses = Constants.DeafultFilter.Select(_ => new CustomProcessInfo(_)).ToList();
+
             if (this.SettingsManager != null)
             {
                 var configurationSettingsStore =
@@ -406,15 +409,11 @@ namespace ReallyStopDebugger.Controls
                         var propertyValue = configurationSettingsStore.GetString(
                                                 "ReallyStopDebugger",
                                                 "CustomProcessList") ?? string.Empty;
-                        var customProcesses =
+                        customProcesses =
                             propertyValue.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)
                                 .Distinct()
                                 .Select(_ => new CustomProcessInfo(_))
                                 .ToList();
-
-                        this.CustomProcesses.Clear();
-                        this.CustomProcesses.AddRange(customProcesses);
-                        this.RefreshCustomProcessDisplayDataGrid();
                     }
 
                     if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ForceClean"))
@@ -443,6 +442,10 @@ namespace ReallyStopDebugger.Controls
                 Console.WriteLine(
                     $"{ReallyStopDebugger.Resources.SettingsManagerNotFound} at {new StackFrame().GetMethod().Name}");
             }
+
+            this.CustomProcesses.Clear();
+            this.CustomProcesses.AddRange(customProcesses);
+            this.RefreshCustomProcessDisplayDataGrid();
         }
 
         #endregion

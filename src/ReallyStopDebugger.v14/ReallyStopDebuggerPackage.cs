@@ -220,7 +220,7 @@ namespace ReallyStopDebugger
             }
         }
 
-        private void SendResultToOutputWindow(int result)
+        private void SendResultToOutputWindow(ProcessOperationException result)
         {
             string returnMessage;
 
@@ -230,14 +230,14 @@ namespace ReallyStopDebugger
 
             var owp = outputWindow.OutputWindowPanes.Add("Output");
 
-            switch (result)
+            switch (result.ResultCode)
             {
-                case Common.Constants.Processeskillsuccess:
+                case ProcessOperationResults.Success:
                     {
                         returnMessage = Resources.ProcesseskillsuccessMessageLite;
                         break;
                     }
-                case Common.Constants.Processesnotfound:
+                case ProcessOperationResults.NotFound:
                     {
                         returnMessage = Resources.ProcessesnotfoundMessageLite;
                         break;
@@ -277,9 +277,9 @@ namespace ReallyStopDebugger
             }
         }
 
-        private int KillProcesses()
+        private ProcessOperationException KillProcesses()
         {
-            int result;
+            ProcessOperationException result;
 
             // Default values. These may be overriden upon configuration store retrieval
             var filter = Common.Constants.DeafultFilter;
