@@ -66,22 +66,13 @@
         </Strings>
       </Button>
 
-      <Button guid="guidReallyStopDebuggerCmdSet" id="cmdidReallyStopDebuggerLite" priority="0x0100" type="Button">
+      <Button guid="guidReallyStopDebuggerCmdSet" id="cmdidReallyStopDebuggerLite" priority="0x0101" type="Button">
         <Parent guid="guidReallyStopDebuggerCmdSet" id="MyMenuGroup" />
         <Icon guid="guidReallyStopDebuggerIcons" id="bmpPicSilent" />
         <Strings>
           <ButtonText>ReallyStopDebugger (silent)</ButtonText>
         </Strings>
       </Button>
-
-      <Button guid="guidReallyStopDebuggerCmdSet" id="cmdidReallyStopDebuggerCfg" priority="0x0100" type="Button">
-        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-        <Icon guid="guidReallyStopDebuggerIcons" id="bmpPicConfig" />
-        <Strings>
-          <ButtonText>ReallyStopDebugger Config</ButtonText>
-        </Strings>
-      </Button>
-
 
     </Buttons>
 
@@ -101,7 +92,7 @@
   <KeyBindings>
     <KeyBinding guid="guidReallyStopDebuggerCmdSet" id="cmdidReallyStopDebuggerLite"
         editor="guidVSStd97" key1="D" mod1="CONTROL" key2="D" mod2="CONTROL"/>
-    <KeyBinding guid="guidReallyStopDebuggerCmdSet" id="cmdidReallyStopDebuggerCfg"
+    <KeyBinding guid="guidReallyStopDebuggerCmdSet" id="cmdidReallyStopDebugger"
         editor="guidVSStd97" key1="D" mod1="CONTROL" key2="C" mod2="CONTROL"/>
   </KeyBindings>
 
@@ -111,11 +102,9 @@
 
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidReallyStopDebuggerCmdSet" value="{D2C106BC-114A-48B7-947E-25D32F287F06}">
-
       <IDSymbol name="MyMenuGroup" value="0x1020" />
       <IDSymbol name="cmdidReallyStopDebugger" value="0x0100" />
-      <IDSymbol name="cmdidReallyStopDebuggerLite" value="0x0102" />
-      <IDSymbol name="cmdidReallyStopDebuggerCfg" value="0x0101" />
+      <IDSymbol name="cmdidReallyStopDebuggerLite" value="0x0101" />
     </GuidSymbol>
 
     <GuidSymbol name="guidImages" value="{f773f8aa-6335-4b40-a64d-18015b1b5f40}" >

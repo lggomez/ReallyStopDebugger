@@ -17,11 +17,13 @@ using Microsoft.VisualStudio.Shell;
 
 using ReallyStopDebugger.Common;
 using ReallyStopDebugger.Native;
+// ReSharper disable All
 
 namespace ReallyStopDebugger.Controls
 {
     using Constants = Common.Constants;
     using Process = System.Diagnostics.Process;
+    using StackFrame = System.Diagnostics.StackFrame;
 
     /// <summary>
     /// Interaction logic for MyControl.xaml
@@ -65,6 +67,7 @@ namespace ReallyStopDebugger.Controls
         private void KillProcessesButtonClick(object sender, RoutedEventArgs e)
         {
             if (this.IsPackageStateInvalid()) return;
+
             this.StatusLabel.Content = string.Empty;
             var dte = ((ReallyStopDebuggerPackage)this.CurrentPackage).GetDte();
 
@@ -77,19 +80,19 @@ namespace ReallyStopDebugger.Controls
             this.UpdateStatusFromResult(result);
         }
 
-        private void UpdateStatusFromResult(int result)
+        private void UpdateStatusFromResult(ProcessOperationException result)
         {
             string returnMessage;
 
-            switch (result)
+            switch (result.ResultCode)
             {
-                case Constants.Processeskillsuccess:
+                case ProcessOperationResults.Success:
                     {
                         returnMessage = ReallyStopDebugger.Resources.ProcesseskillsuccessMessage;
                         this.StatusLabel.Foreground = Brushes.Green;
                         break;
                     }
-                case Constants.Processesnotfound:
+                case ProcessOperationResults.NotFound:
                     {
                         returnMessage = ReallyStopDebugger.Resources.ProcessesnotfoundMessage;
                         this.StatusLabel.Foreground = Brushes.Orange;
@@ -106,7 +109,7 @@ namespace ReallyStopDebugger.Controls
             this.StatusLabel.Content = returnMessage;
         }
 
-        private int KillProcesses()
+        private ProcessOperationException KillProcesses()
         {
             var processNameList =
                 this.processDisplayDataGrid.ItemsSource.Cast<ProcessInfo>()
@@ -199,15 +202,20 @@ namespace ReallyStopDebugger.Controls
                 {
                     this.CustomProcesses.RemoveAt(e.Row.GetIndex());
                 }
-
-                // NOTE: calling .RemoveAll can cause a ArgumentOutOfRangeException 
-                // in the RefreshCustomProcessDisplayDataGrid null assignment. Possible compiler bug?
-                this.CustomProcesses =
-                    this.CustomProcesses.Where(_ => !string.IsNullOrWhiteSpace(_.ProcessName)).ToList();
-                this.RefreshCustomProcessDisplayDataGrid();
             }
 
+            this.UpdateCustomProcesses(null, true);
+            this.RefreshCustomProcessDisplayDataGrid();
             this.ResetCustomProcessDisplayDataGridFocus();
+        }
+
+        private void ProcessCustomDisplayDataGrid_OnSelected(object sender, RoutedEventArgs e)
+        {
+            if (e.OriginalSource.GetType() == typeof(DataGridCell))
+            {
+                DataGrid grid = (DataGrid)sender;
+                grid.BeginEdit(e);
+            }
         }
 
         #endregion
@@ -249,6 +257,7 @@ namespace ReallyStopDebugger.Controls
         private void MapProcessResults(IProgress<string> progress, List<Process> childProcesses)
         {
             progress.Report(ReallyStopDebugger.Resources.ProgressReport_2);
+
             if (childProcesses.Any())
             {
                 var childProcessesInfo =
@@ -319,51 +328,26 @@ namespace ReallyStopDebugger.Controls
 
         private void AdjustWindowSize()
         {
-            var window = this.DTE.ActiveWindow;
-
-            for (int i = 1; i <= window.Collection.Count; i++)
+            try
             {
-                var item = window.Collection.Item(i);
+                var window = this.DTE.ActiveWindow;
 
-                if (item.Caption.Equals(
-                    ReallyStopDebugger.Resources.ToolWindowTitle,
-                    StringComparison.InvariantCultureIgnoreCase))
+                for (int i = 1; i <= window.Collection.Count; i++)
                 {
-                    item.Height = (int)this.Height - 50;
-                    item.Width = (int)this.Width;
+                    var item = window.Collection.Item(i);
+
+                    if (item.Caption.Equals(
+                        ReallyStopDebugger.Resources.ToolWindowTitle,
+                        StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        item.Height = (int)this.Height - 50;
+                        item.Width = (int)this.Width;
+                    }
                 }
             }
-        }
-
-        private void SaveExtensionSettings()
-        {
-            if (this.SettingsManager != null)
+            catch
             {
-                var userSettingsStore = this.SettingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
-                var collectionExists = userSettingsStore.CollectionExists("ReallyStopDebugger");
-
-                if (!collectionExists)
-                {
-                    userSettingsStore.CreateCollection("ReallyStopDebugger");
-                }
-
-                var customProcesses = string.Join(
-                    "\r\n",
-                    this.GetCustomProcessNames());
-
-                userSettingsStore.SetString("ReallyStopDebugger", "CustomProcessList", customProcesses);
-                userSettingsStore.SetString(
-                    "ReallyStopDebugger",
-                    "ForceClean",
-                    this.forceCleanCheckBox.IsChecked.GetValueOrDefault().ToString());
-                userSettingsStore.SetString(
-                    "ReallyStopDebugger",
-                    "UserProcessMatch",
-                    this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
-                userSettingsStore.SetString(
-                    "ReallyStopDebugger",
-                    "ChildProcessMatch",
-                    this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
+                // We don't want to interrupt window initialization in case of failure
             }
         }
 
@@ -371,57 +355,119 @@ namespace ReallyStopDebugger.Controls
         {
             return this.CustomProcesses.Select(_ => _.ProcessName)
                 .Where(_ => !string.IsNullOrWhiteSpace(_))
-                .Distinct()
                 .ToList();
+        }
+
+        private void SaveExtensionSettings()
+        {
+            if (this.SettingsManager != null)
+            {
+                var userSettingsStore = this.SettingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
+                var collectionExists = userSettingsStore.CollectionExists(Constants.CollectionPath);
+
+                if (!collectionExists)
+                {
+                    userSettingsStore.CreateCollection(Constants.CollectionPath);
+                }
+
+                var customProcesses = string.Join("\r\n", this.GetCustomProcessNames());
+
+                userSettingsStore.SetString(Constants.CollectionPath, Constants.CustomProcessesProperty, customProcesses);
+                userSettingsStore.SetString(
+                    Constants.CollectionPath,
+                    Constants.ForceCleanProperty,
+                    this.forceCleanCheckBox.IsChecked.GetValueOrDefault().ToString());
+                userSettingsStore.SetString(
+                    Constants.CollectionPath,
+                    Constants.UserProcessMatchProperty,
+                    this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
+                userSettingsStore.SetString(
+                    Constants.CollectionPath,
+                    Constants.ChildProcessMatchProperty,
+                    this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
+            }
+            else
+            {
+                Console.WriteLine(
+                    $"{ReallyStopDebugger.Resources.SettingsManagerNotFound} at {new StackFrame().GetMethod().Name}");
+            }
         }
 
         private void LoadExtensionSettings()
         {
+            // Default values. These may be overriden upon configuration store retrieval
+            var customProcesses = Constants.DeafultFilter.Select(_ => new CustomProcessInfo(_)).ToList();
+
             if (this.SettingsManager != null)
             {
                 var configurationSettingsStore =
                     this.SettingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
-                var collectionExists = configurationSettingsStore.CollectionExists("ReallyStopDebugger");
+                var collectionExists = configurationSettingsStore.CollectionExists(Constants.CollectionPath);
 
                 if (collectionExists)
                 {
-                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "CustomProcessList"))
+                    if (configurationSettingsStore.PropertyExists(Constants.CollectionPath, Constants.CustomProcessesProperty))
                     {
                         var propertyValue = configurationSettingsStore.GetString(
-                                                "ReallyStopDebugger",
-                                                "CustomProcessList") ?? string.Empty;
-                        var customProcesses =
+                                                Constants.CollectionPath,
+                                                Constants.CustomProcessesProperty) ?? string.Empty;
+                        customProcesses.AddRange(
                             propertyValue.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)
-                                .Distinct()
                                 .Select(_ => new CustomProcessInfo(_))
-                                .ToList();
-
-                        this.CustomProcesses.Clear();
-                        this.CustomProcesses.AddRange(customProcesses);
-                        this.RefreshCustomProcessDisplayDataGrid();
+                                .ToList());
                     }
 
-                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ForceClean"))
+                    if (configurationSettingsStore.PropertyExists(Constants.CollectionPath, Constants.ForceCleanProperty))
                     {
                         this.forceCleanCheckBox.IsChecked =
-                            Convert.ToBoolean(configurationSettingsStore.GetString("ReallyStopDebugger", "ForceClean"));
+                            Convert.ToBoolean(configurationSettingsStore.GetString(Constants.CollectionPath, Constants.ForceCleanProperty));
                     }
 
-                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "UserProcessMatch"))
+                    if (configurationSettingsStore.PropertyExists(Constants.CollectionPath, Constants.UserProcessMatchProperty))
                     {
                         this.userCriteriaRadioButton_userOnly.IsChecked =
                             Convert.ToBoolean(
-                                configurationSettingsStore.GetString("ReallyStopDebugger", "UserProcessMatch"));
+                                configurationSettingsStore.GetString(Constants.CollectionPath, Constants.UserProcessMatchProperty));
                     }
 
-                    if (configurationSettingsStore.PropertyExists("ReallyStopDebugger", "ChildProcessMatch"))
+                    if (configurationSettingsStore.PropertyExists(Constants.CollectionPath, Constants.ChildProcessMatchProperty))
                     {
                         this.userCriteriaRadioButton_userOnly.IsChecked =
                             Convert.ToBoolean(
-                                configurationSettingsStore.GetString("ReallyStopDebugger", "ChildProcessMatch"));
+                                configurationSettingsStore.GetString(Constants.CollectionPath, Constants.ChildProcessMatchProperty));
                     }
                 }
             }
+            else
+            {
+                Console.WriteLine(
+                    $"{ReallyStopDebugger.Resources.SettingsManagerNotFound} at {new StackFrame().GetMethod().Name}");
+            }
+
+            this.UpdateCustomProcesses(customProcesses, true);
+            this.RefreshCustomProcessDisplayDataGrid();
+        }
+
+        private void UpdateCustomProcesses(List<CustomProcessInfo> processInfoList, bool? replaceAll = false)
+        {
+            // Calling .RemoveAll, .Clear or related method will cause a ArgumentOutOfRangeException 
+            // in the RefreshCustomProcessDisplayDataGrid null assignment due to
+            // the datasource binding events in the wpf datagrid control
+
+            CustomProcessInfo[] copy = new CustomProcessInfo[this.CustomProcesses.Count];
+            this.CustomProcesses.CopyTo(copy);
+            var target = copy.Where(_ => !string.IsNullOrWhiteSpace(_.ProcessName))
+                .Distinct()
+                .GroupBy(_ => _.ProcessName)
+                .Select(g => g.First())
+                .ToList();
+
+            if (!replaceAll.GetValueOrDefault() && (processInfoList != null))
+            {
+                target.AddRange(processInfoList);
+            }
+
+            this.CustomProcesses = target;
         }
 
         #endregion

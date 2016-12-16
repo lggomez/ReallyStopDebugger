@@ -1,3 +1,7 @@
+v2.0.1
+	-Fix: Prevent possible crashes on config window
+	-Fix: Improve exception handling and error reporting
+
 v2.0
 	-Fix: Prevent handle leaks on hard crashes
 	-Fix: Code cleanup, avoid NRE's in several methods

@@ -137,7 +137,7 @@
                   VerticalAlignment="Top" Height="100" IsManipulationEnabled="True" CanUserAddRows="True"
                   CanUserResizeRows="False"
                   Focusable="True" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto"
-                  CellEditEnding="ProcessCustomDisplayDataGrid_OnCellEditEnding"
+                  CellEditEnding="ProcessCustomDisplayDataGrid_OnCellEditEnding" DataGridCell.Selected="ProcessCustomDisplayDataGrid_OnSelected"
                   GridLinesVisibility="Horizontal" HeadersVisibility="None" AutoGenerateColumns="False"
                   IsReadOnly="False" SelectionMode="Single"
                   ItemsSource="{Binding CustomProcesses, BindsDirectlyToSource=True, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:MyControl}}}">
