@@ -275,9 +275,10 @@ if "$(ConfigurationName)"=="DebugVS11" ("$(PROGRAMFILES)\Microsoft Visual Studio
 if "$(ConfigurationName)"=="DebugVS12" ("$(PROGRAMFILES)\Microsoft Visual Studio 12.0\VSSDK\VisualStudioIntegration\Tools\Bin\CreateExpInstance.exe" /Reset /VSInstance=12.0 /RootSuffix=Exp)</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent></PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
-   <!--<PropertyGroup>
+  <!--<PropertyGroup>
     <PostBuildEvent>if "$(ConfigurationName)"=="Debug" ("$(PROGRAMFILES)\Microsoft Visual Studio 14.0\Common7\IDE\VSIXInstaller.exe" /q /u:"ReallyStopDebugger_lggomez.ac0339e4-4a14-4eaf-9dd6-3d69d61b4c30")
 if "$(ConfigurationName)"=="DebugVS11" ("$(PROGRAMFILES)\Microsoft Visual Studio 12.0\Common7\IDE\VSIXInstaller.exe" /q /u:"ReallyStopDebugger_lggomez.ac0339e4-4a14-4eaf-9dd6-3d69d61b4c30")
 if "$(ConfigurationName)"=="DebugVS12" ("$(PROGRAMFILES)\Microsoft Visual Studio 11.0\Common7\IDE\VSIXInstaller.exe" /q /u:"ReallyStopDebugger_lggomez.ac0339e4-4a14-4eaf-9dd6-3d69d61b4c30")
