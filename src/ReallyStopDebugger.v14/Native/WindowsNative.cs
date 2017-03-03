@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Principal;
@@ -266,6 +267,7 @@ namespace ReallyStopDebugger.Native
             FILE_GENERIC_EXECUTE = StandardRightsExecute | FILE_READ_ATTRIBUTES | FILE_EXECUTE | Synchronize
         }
 
+        // https://msdn2.microsoft.com/en-us/library/aa366386.aspx
         public enum TCP_TABLE_CLASS
         {
             TCP_TABLE_BASIC_LISTENER,
@@ -278,6 +280,86 @@ namespace ReallyStopDebugger.Native
             TCP_TABLE_OWNER_MODULE_CONNECTIONS,
             TCP_TABLE_OWNER_MODULE_ALL
         }
+
+        // https://msdn.microsoft.com/en-us/library/aa366896
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MIB_TCP6ROW_OWNER_PID
+        {
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
+            public byte[] localAddr;
+            public uint localScopeId;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public byte[] localPort;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
+            public byte[] remoteAddr;
+            public uint remoteScopeId;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public byte[] remotePort;
+            public uint state;
+            public uint owningPid;
+        }
+
+        // https://msdn.microsoft.com/en-us/library/windows/desktop/aa366905
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MIB_TCP6TABLE_OWNER_PID
+        {
+            public uint dwNumEntries;
+            [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.Struct, SizeConst = 1)]
+            public MIB_TCP6ROW_OWNER_PID[] table;
+        }
+
+        // https://msdn.microsoft.com/en-us/library/aa366896.aspx
+        public enum MIB_TCP_STATE
+        {
+            MIB_TCP_STATE_CLOSED,
+            MIB_TCP_STATE_LISTEN,
+            MIB_TCP_STATE_SYN_SENT,
+            MIB_TCP_STATE_SYN_RCVD,
+            MIB_TCP_STATE_ESTAB,
+            MIB_TCP_STATE_FIN_WAIT1,
+            MIB_TCP_STATE_FIN_WAIT2,
+            MIB_TCP_STATE_CLOSE_WAIT,
+            MIB_TCP_STATE_CLOSING,
+            MIB_TCP_STATE_LAST_ACK,
+            MIB_TCP_STATE_TIME_WAIT,
+            MIB_TCP_STATE_DELETE_TCB
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MIB_TCPROW_OWNER_PID
+        {
+            public uint state;
+            public uint localAddr;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public byte[] localPort;
+            public uint remoteAddr;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public byte[] remotePort;
+            public uint owningPid;
+
+            public uint ProcessId => owningPid;
+
+            public IPAddress LocalAddress => new IPAddress(localAddr);
+
+            public ushort LocalPort => BitConverter.ToUInt16(new byte[2] { localPort[1], localPort[0] }, 0);
+
+            public IPAddress RemoteAddress => new IPAddress(remoteAddr);
+
+            public ushort RemotePort => BitConverter.ToUInt16(new byte[2] { remotePort[1], remotePort[0] }, 0);
+
+            public MIB_TCP_STATE State => (MIB_TCP_STATE)state;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MIB_TCPTABLE_OWNER_PID
+        {
+            public uint dwNumEntries;
+            [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.Struct, SizeConst = 1)]
+            public MIB_TCPROW_OWNER_PID[] table;
+        }
+
+        public const int AF_INET = 2;    // IP_v4 = System.Net.Sockets.AddressFamily.InterNetwork
+        public const int AF_INET6 = 23;  // IP_v6 = System.Net.Sockets.AddressFamily.InterNetworkV6
 
         #region File Flags and attributes
         public const short FILE_ATTRIBUTE_NORMAL = 0x80;
@@ -718,6 +800,63 @@ namespace ReallyStopDebugger.Native
             }
 
             return filePath;
+        }
+
+        // ReSharper disable once InconsistentNaming
+        public static List<MIB_TCPROW_OWNER_PID> GetAllTCPConnections() => GetTCPConnections<MIB_TCPROW_OWNER_PID, MIB_TCPTABLE_OWNER_PID>(AF_INET);
+
+        // ReSharper disable once InconsistentNaming
+        public static List<MIB_TCP6ROW_OWNER_PID> GetAllTCPv6Connections() => GetTCPConnections<MIB_TCP6ROW_OWNER_PID, MIB_TCP6TABLE_OWNER_PID>(AF_INET6);
+
+        private static List<IPR> GetTCPConnections<IPR, IPT>(int ipVersion)
+        {
+            //IPR = Row Type, IPT = Table Type
+            IPR[] tableRows = null;
+            int buffSize = 0;
+
+            var dwNumEntriesField = typeof(IPT).GetField("dwNumEntries");
+
+            // Allocate expected memory
+            uint ret = GetExtendedTcpTable(IntPtr.Zero, ref buffSize, true, ipVersion, TCP_TABLE_CLASS.TCP_TABLE_OWNER_PID_ALL);
+            IntPtr tcpTablePtr = Marshal.AllocHGlobal(buffSize);
+
+            try
+            {
+                ret = GetExtendedTcpTable(tcpTablePtr, ref buffSize, true, ipVersion,
+                    TCP_TABLE_CLASS.TCP_TABLE_OWNER_PID_ALL);
+
+                if (ret != 0)
+                    return new List<IPR>();
+
+                // Get the number of entries in the table
+                IPT table = (IPT) Marshal.PtrToStructure(tcpTablePtr, typeof(IPT));
+                int rowStructSize = Marshal.SizeOf(typeof(IPR));
+                uint numEntries = (uint) dwNumEntriesField.GetValue(table);
+
+                // Initialize the buffer
+                tableRows = new IPR[numEntries];
+
+                IntPtr rowPtr = (IntPtr) ((long) tcpTablePtr + 4);
+
+                for (int i = 0; i < numEntries; i++)
+                {
+                    IPR tcpRow = (IPR) Marshal.PtrToStructure(rowPtr, typeof(IPR));
+                    tableRows[i] = tcpRow;
+                    // Add offset for next element
+                    rowPtr = (IntPtr) ((long) rowPtr + rowStructSize);
+                }
+            }
+            catch
+            {
+                // Ignored
+            }
+            finally
+            {
+                // Free the Memory
+                Marshal.FreeHGlobal(tcpTablePtr);
+            }
+
+            return tableRows?.ToList() ?? new List<IPR>();
         }
     }
 }

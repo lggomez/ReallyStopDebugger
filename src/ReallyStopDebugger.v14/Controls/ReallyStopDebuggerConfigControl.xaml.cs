@@ -308,7 +308,7 @@ namespace ReallyStopDebugger.Controls
 
                 if (windowsIdentity.Owner
                     .IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid)
-                    && (windowsIdentity.Owner == windowsIdentity.User))
+                    || (windowsIdentity.Owner == windowsIdentity.User))
                 {
                     this.AdminStatusLabel.Content = "ENABLED";
                     this.AdminStatusLabel.Foreground = Brushes.Green;
