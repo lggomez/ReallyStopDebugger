@@ -47,7 +47,7 @@
 
         <CheckBox x:Name="forceCleanCheckBox"
                   Foreground="{DynamicResource ResourceKey={x:Static vsui:EnvironmentColors.SystemMenuTextBrushKey}}"
-                  Content="Attempt to force &#xD;&#xA;clean solution" Margin="10,148,0,0" Grid.Row="2"
+                  Content="Attempt to force &#xD;&#xA;clean solution" Margin="4,292,0,0" Grid.Row="2"
                   VerticalAlignment="Top" Grid.Column="2" HorizontalAlignment="Left" />
         <Button Grid.Row="3" Content="_Stop debugging!" Click="KillProcessesButtonClick" x:Name="killProcessesButton"
                 IsDefault="True"
@@ -75,17 +75,17 @@
                Width="121" Margin="0,5,0,0" Grid.Column="2" />
         <RadioButton x:Name="processCriteriaRadioButton_children"
                      Foreground="{DynamicResource ResourceKey={x:Static vsui:EnvironmentColors.SystemMenuTextBrushKey}}"
-                     Content="Children only" Grid.Column="2" HorizontalAlignment="Left" Margin="10,119,0,0"
+                     Content="Children only" Grid.Column="2" HorizontalAlignment="Left" Margin="10,117,0,0"
                      Grid.Row="2" VerticalAlignment="Top" GroupName="processMatchOptions" />
         <RadioButton x:Name="processCriteriaRadioButton_allProcesses"
                      Foreground="{DynamicResource ResourceKey={x:Static vsui:EnvironmentColors.SystemMenuTextBrushKey}}"
-                     Content="All processes" Grid.Column="2" HorizontalAlignment="Left" Margin="10,99,0,0" Grid.Row="2"
+                     Content="All processes" Grid.Column="2" HorizontalAlignment="Left" Margin="10,97,0,0" Grid.Row="2"
                      VerticalAlignment="Top" GroupName="processMatchOptions" />
 
         <Label x:Name="processCriteriaLabel"
                Foreground="{DynamicResource ResourceKey={x:Static vsui:EnvironmentColors.SystemMenuTextBrushKey}}"
                Content="Process criteria: " Grid.Column="2" HorizontalAlignment="Left" Height="24" Grid.Row="2"
-               VerticalAlignment="Top" Width="121" Margin="0,70,0,0" />
+               VerticalAlignment="Top" Width="121" Margin="0,68,0,0" />
 
         <DataGrid x:Name="processDisplayDataGrid" Margin="5,5,5,0" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                   VerticalAlignment="Top" Height="182" IsManipulationEnabled="False" VerticalScrollBarVisibility="Auto"
@@ -146,5 +146,26 @@
                                     IsReadOnly="False" Binding="{Binding ProcessName, Mode=TwoWay}" />
             </DataGrid.Columns>
         </DataGrid>
+        <Label Grid.Row="2" HorizontalAlignment="Center" Height="28" VerticalAlignment="Bottom"
+            Foreground="{DynamicResource ResourceKey={x:Static vsui:EnvironmentColors.SystemMenuTextBrushKey}}"
+            Background="{DynamicResource ResourceKey={x:Static SystemColors.WindowFrameColor}}" Width="111"
+            Margin="4,0,10,140" FontWeight="Bold" FontSize="13.333" x:Name="AdminStatusLabelCaption"
+            HorizontalContentAlignment="Left" Grid.Column="2" Content="Admin status:"/>
+        <Label Grid.Row="2" Grid.Column="2" x:Name="AdminStatusLabel" Content="AdminStatus"
+            Margin="4,260,10,113" FontWeight="Bold"/>
+        <RadioButton x:Name="processCriteriaRadioButton_byPort"
+            Foreground="{DynamicResource ResourceKey={x:Static vsui:EnvironmentColors.SystemMenuTextBrushKey}}"
+            Content="By ports:" Grid.Column="2" HorizontalAlignment="Left" Margin="10,183,0,0"
+            Grid.Row="2" VerticalAlignment="Top" GroupName="processPortOptions" ToolTip="Enter ports separated by commas: 80, 8080" 
+                     Checked="ProcessCriteriaRadioButton_byPort_OnChecked"/>
+        <RadioButton x:Name="processCriteriaRadioButton_noPort"
+            Foreground="{DynamicResource ResourceKey={x:Static vsui:EnvironmentColors.SystemMenuTextBrushKey}}"
+            Content="No filtering" Grid.Column="2" HorizontalAlignment="Left" Margin="10,163,0,0" Grid.Row="2"
+            VerticalAlignment="Top" GroupName="processPortOptions" />
+        <Label x:Name="portCriteriaLabel"
+            Foreground="{DynamicResource ResourceKey={x:Static vsui:EnvironmentColors.SystemMenuTextBrushKey}}"
+            Content="Port criteria: " Grid.Column="2" HorizontalAlignment="Left" Height="24" Grid.Row="2"
+            VerticalAlignment="Top" Width="121" Margin="0,134,0,0" />
+        <TextBox x:Name="PortsTextBox" Grid.Column="2" HorizontalAlignment="Left" Height="23" Margin="10,203,0,0" Grid.Row="2" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="105"/>
     </Grid>
 </UserControl>

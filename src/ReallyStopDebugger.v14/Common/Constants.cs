@@ -21,6 +21,8 @@ namespace ReallyStopDebugger.Common
 
         public static string ChildProcessMatchProperty { get; } = "ChildProcessMatch";
 
+        public static string PortProcessMatchProperty { get; } = "PortProcessMatch";
+
         #endregion
     }
 

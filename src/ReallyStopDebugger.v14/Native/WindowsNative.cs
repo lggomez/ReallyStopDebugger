@@ -18,10 +18,6 @@ using ReallyStopDebugger.Common;
 
 namespace ReallyStopDebugger.Native
 {
-    using System.Drawing;
-    using System.Runtime.CompilerServices;
-    using System.Windows.Forms;
-
     internal static class WindowsNative
     {
         #region Marshalling structs & consts
@@ -270,6 +266,19 @@ namespace ReallyStopDebugger.Native
             FILE_GENERIC_EXECUTE = StandardRightsExecute | FILE_READ_ATTRIBUTES | FILE_EXECUTE | Synchronize
         }
 
+        public enum TCP_TABLE_CLASS
+        {
+            TCP_TABLE_BASIC_LISTENER,
+            TCP_TABLE_BASIC_CONNECTIONS,
+            TCP_TABLE_BASIC_ALL,
+            TCP_TABLE_OWNER_PID_LISTENER,
+            TCP_TABLE_OWNER_PID_CONNECTIONS,
+            TCP_TABLE_OWNER_PID_ALL,
+            TCP_TABLE_OWNER_MODULE_LISTENER,
+            TCP_TABLE_OWNER_MODULE_CONNECTIONS,
+            TCP_TABLE_OWNER_MODULE_ALL
+        }
+
         #region File Flags and attributes
         public const short FILE_ATTRIBUTE_NORMAL = 0x80;
 
@@ -450,6 +459,9 @@ namespace ReallyStopDebugger.Native
             [In] [Out] StringBuilder path,
             int bufLen,
             int flags);
+
+        [DllImport("iphlpapi.dll", SetLastError = true)]
+        static extern uint GetExtendedTcpTable(IntPtr pTcpTable, ref int dwOutBufLen, bool sort, int ipVersion, TCP_TABLE_CLASS tblClass, uint reserved = 0);
 
         #endregion
 

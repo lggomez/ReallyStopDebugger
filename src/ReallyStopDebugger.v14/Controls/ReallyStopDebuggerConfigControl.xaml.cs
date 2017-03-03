@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -53,6 +54,7 @@ namespace ReallyStopDebugger.Controls
         public MyControl()
         {
             this.InitializeComponent();
+            this.VerifyElevatedProcess();
 
             // Default control states
             this.processCriteriaRadioButton_allProcesses.IsChecked = true;
@@ -218,6 +220,11 @@ namespace ReallyStopDebugger.Controls
             }
         }
 
+        private void ProcessCriteriaRadioButton_byPort_OnChecked(object sender, RoutedEventArgs e)
+        {
+            this.PortsTextBox.IsEnabled = this.processCriteriaRadioButton_byPort.IsChecked.GetValueOrDefault();
+        }
+
         #endregion
 
         #region Workers and process handling code
@@ -292,6 +299,33 @@ namespace ReallyStopDebugger.Controls
         #endregion
 
         #region Helper Methods
+
+        private void VerifyElevatedProcess()
+        {
+            try
+            {
+                var windowsIdentity = WindowsIdentity.GetCurrent();
+
+                if (windowsIdentity.Owner
+                    .IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid)
+                    && (windowsIdentity.Owner == windowsIdentity.User))
+                {
+                    this.AdminStatusLabel.Content = "ENABLED";
+                    this.AdminStatusLabel.Foreground = Brushes.Green;
+                }
+                else
+                {
+                    this.AdminStatusLabel.Content = "DISABLED";
+                    this.AdminStatusLabel.Foreground = Brushes.Red;
+                }
+            }
+            catch (Exception)
+            {
+                this.AdminStatusLabel.Content = "N/A";
+                this.AdminStatusLabel.Foreground = Brushes.Red;
+            }
+        }
+
 
         private void RefreshProcessDisplayDataGrid()
         {
@@ -385,6 +419,10 @@ namespace ReallyStopDebugger.Controls
                     Constants.CollectionPath,
                     Constants.ChildProcessMatchProperty,
                     this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault().ToString());
+                userSettingsStore.SetString(
+                    Constants.CollectionPath,
+                    Constants.PortProcessMatchProperty,
+                    this.processCriteriaRadioButton_byPort.IsChecked.GetValueOrDefault().ToString());
             }
             else
             {
@@ -428,13 +466,27 @@ namespace ReallyStopDebugger.Controls
                         this.userCriteriaRadioButton_userOnly.IsChecked =
                             Convert.ToBoolean(
                                 configurationSettingsStore.GetString(Constants.CollectionPath, Constants.UserProcessMatchProperty));
+                        this.userCriteriaRadioButton_allUsers.IsChecked =
+                            !this.userCriteriaRadioButton_userOnly.IsChecked;
                     }
 
                     if (configurationSettingsStore.PropertyExists(Constants.CollectionPath, Constants.ChildProcessMatchProperty))
                     {
-                        this.userCriteriaRadioButton_userOnly.IsChecked =
+                        this.processCriteriaRadioButton_children.IsChecked =
                             Convert.ToBoolean(
                                 configurationSettingsStore.GetString(Constants.CollectionPath, Constants.ChildProcessMatchProperty));
+                        this.processCriteriaRadioButton_allProcesses.IsChecked =
+                            !this.processCriteriaRadioButton_children.IsChecked;
+                    }
+
+                    if (configurationSettingsStore.PropertyExists(Constants.CollectionPath, Constants.PortProcessMatchProperty))
+                    {
+                        this.processCriteriaRadioButton_byPort.IsChecked =
+                            Convert.ToBoolean(
+                                configurationSettingsStore.GetString(Constants.CollectionPath, Constants.PortProcessMatchProperty));
+                        this.processCriteriaRadioButton_noPort.IsChecked =
+                            !this.processCriteriaRadioButton_byPort.IsChecked;
+                        this.PortsTextBox.IsEnabled = this.processCriteriaRadioButton_byPort.IsChecked.GetValueOrDefault();
                     }
                 }
             }
