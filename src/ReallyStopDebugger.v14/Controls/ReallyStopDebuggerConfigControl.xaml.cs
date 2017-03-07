@@ -121,13 +121,29 @@ namespace ReallyStopDebugger.Controls
                     .Distinct()
                     .ToList();
 
+            var portList = this.SanitizeAndGetPortsAsList();
+
             var result = ProcessHelper.KillProcesses(
                 this.CurrentPackage,
                 processNameList,
                 this.userCriteriaRadioButton_userOnly.IsChecked.GetValueOrDefault(),
-                this.processCriteriaRadioButton_children.IsChecked.GetValueOrDefault());
+                this.processCriteriaRadioButton_byPort.IsChecked.GetValueOrDefault(),
+                new KeyValuePair<bool, List<string>>(this.processCriteriaRadioButton_children.IsChecked.GetValueOrDefault(), portList));
 
             return result;
+        }
+
+        private List<string> SanitizeAndGetPortsAsList()
+        {
+            int num = 0;
+            var portList = this.PortsTextBox.Text.Split(',').Where(_ => int.TryParse(_, out num)).ToList();
+            this.PortsTextBox.Text = string.Join(",", portList);
+            return portList;
+        }
+
+        private string SanitizeAndGetPorts()
+        {
+            return string.Join(",", this.SanitizeAndGetPortsAsList());
         }
 
         private void AttemptHardClean(DTE dte)
@@ -265,6 +281,8 @@ namespace ReallyStopDebugger.Controls
         {
             progress.Report(ReallyStopDebugger.Resources.ProgressReport_2);
 
+            //childProcesses = Process.GetProcesses().ToList();
+
             if (childProcesses.Any())
             {
                 var childProcessesInfo =
@@ -272,6 +290,12 @@ namespace ReallyStopDebugger.Controls
                         .Select(g => new ProcessInfo(g))
                         .Where(c => !string.IsNullOrEmpty(c.ProcessName))
                         .ToList();
+
+                var connections = WindowsNative.GetAllTCPConnections();
+                foreach (var childProcess in childProcessesInfo)
+                {
+                    childProcess.ProcessPort = (connections.Where(_ => (_.owningPid == childProcess.Id) || (_.ProcessId == childProcess.Id)).FirstOrDefault().LocalPort);
+                }
 
                 this.AllProcessesSelected = false;
                 this.Processes = childProcessesInfo;
@@ -423,6 +447,10 @@ namespace ReallyStopDebugger.Controls
                     Constants.CollectionPath,
                     Constants.PortProcessMatchProperty,
                     this.processCriteriaRadioButton_byPort.IsChecked.GetValueOrDefault().ToString());
+                userSettingsStore.SetString(
+                    Constants.CollectionPath,
+                    Constants.PortListProperty,
+                    this.SanitizeAndGetPorts());
             }
             else
             {

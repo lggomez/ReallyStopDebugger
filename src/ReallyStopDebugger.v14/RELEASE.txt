@@ -1,3 +1,7 @@
+v2.1
+	-New: Add admin status label to show if VS instance is running as admin
+	-New: Filter processes by port
+
 v2.0.1
 	-Fix: Prevent possible crashes on config window
 	-Fix: Improve exception handling and error reporting

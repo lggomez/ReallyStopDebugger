@@ -341,11 +341,31 @@ namespace ReallyStopDebugger.Native
 
             public IPAddress LocalAddress => new IPAddress(localAddr);
 
-            public ushort LocalPort => BitConverter.ToUInt16(new byte[2] { localPort[1], localPort[0] }, 0);
+            public ushort LocalPort
+            {
+                get
+                {
+                    if (this.localPort != null)
+                    {
+                        return BitConverter.ToUInt16(new byte[2] { this.localPort[1], this.localPort[0] }, 0);
+                    }
+                    return BitConverter.ToUInt16(new byte[2] { 0, 0 }, 0);
+                }
+            }
 
             public IPAddress RemoteAddress => new IPAddress(remoteAddr);
 
-            public ushort RemotePort => BitConverter.ToUInt16(new byte[2] { remotePort[1], remotePort[0] }, 0);
+            public ushort RemotePort
+            {
+                get
+                {
+                    if (this.remotePort != null)
+                    {
+                        return BitConverter.ToUInt16(new byte[2] { this.remotePort[1], this.remotePort[0] }, 0);
+                    }
+                    return BitConverter.ToUInt16(new byte[2] { 0, 0 }, 0);
+                }
+            }
 
             public MIB_TCP_STATE State => (MIB_TCP_STATE)state;
         }

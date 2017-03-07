@@ -19,6 +19,8 @@ using ReallyStopDebugger.Native;
 
 namespace ReallyStopDebugger
 {
+    using System.Collections.Generic;
+
     using Constants = EnvDTE.Constants;
 
     /// <summary>
@@ -37,7 +39,7 @@ namespace ReallyStopDebugger
 
     // This attribute is used to register the information needed to show this package
     // in the Help/About dialog of Visual Studio.
-    [InstalledProductRegistration("#110", "#112", "2.0.1", IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", "2.1", IconResourceID = 400)]
 
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
@@ -255,6 +257,8 @@ namespace ReallyStopDebugger
             {
                 var filterByLocalUser = false;
                 var filterByChildren = false;
+                var filterByPort = false;
+                List<string> portList = new List<string>();
 
                 if (this.configurationSettingsStore.PropertyExists(Common.Constants.CollectionPath, Common.Constants.CustomProcessesProperty))
                 {
@@ -276,11 +280,22 @@ namespace ReallyStopDebugger
                         Convert.ToBoolean(this.configurationSettingsStore.GetString(Common.Constants.CollectionPath, Common.Constants.ChildProcessMatchProperty));
                 }
 
-                result = ProcessHelper.KillProcesses(this, filter.ToArray(), filterByLocalUser, filterByChildren, true);
+                if (this.configurationSettingsStore.PropertyExists(Common.Constants.CollectionPath, Common.Constants.PortProcessMatchProperty))
+                {
+                    filterByPort =
+                        Convert.ToBoolean(this.configurationSettingsStore.GetString(Common.Constants.CollectionPath, Common.Constants.PortProcessMatchProperty));
+                }
+
+                if (this.configurationSettingsStore.PropertyExists(Common.Constants.CollectionPath, Common.Constants.PortListProperty))
+                {
+                    portList = this.configurationSettingsStore.GetString(Common.Constants.CollectionPath, Common.Constants.PortListProperty).Split(',').ToList();
+                }
+
+                result = ProcessHelper.KillProcesses(this, filter.ToArray(), filterByLocalUser, filterByChildren, new KeyValuePair<bool, List<string>>(filterByPort, portList), true);
             }
             else
             {
-                result = ProcessHelper.KillProcesses(this, filter.ToArray(), false, false, true);
+                result = ProcessHelper.KillProcesses(this, filter.ToArray(), false, false, new KeyValuePair<bool, List<string>>(false, new List<string>()), true);
             }
 
             return result;

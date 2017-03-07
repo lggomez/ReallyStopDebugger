@@ -23,6 +23,8 @@ namespace ReallyStopDebugger.Common
 
         public static string PortProcessMatchProperty { get; } = "PortProcessMatch";
 
+        public static string PortListProperty { get; } = "PortList";
+
         #endregion
     }
 

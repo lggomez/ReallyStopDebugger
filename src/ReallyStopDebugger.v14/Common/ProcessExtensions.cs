@@ -2,10 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the src\ReallyStopDebugger directory for full license information.
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace ReallyStopDebugger.Common
 {
+    
+
     /// <summary>
     /// These wrappers catch exceptions when accessing closed processes information
     /// </summary>
@@ -24,6 +27,10 @@ namespace ReallyStopDebugger.Common
             {
                 return string.Empty;
             }
+            catch (Win32Exception)
+            {
+                return string.Empty;
+            }
         }
 
         /// <summary>
@@ -36,6 +43,10 @@ namespace ReallyStopDebugger.Common
                 return !p.HasExited ? p.Id : 0;
             }
             catch (InvalidOperationException)
+            {
+                return 0;
+            }
+            catch (Win32Exception)
             {
                 return 0;
             }

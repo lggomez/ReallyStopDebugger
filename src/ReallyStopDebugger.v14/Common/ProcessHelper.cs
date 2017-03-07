@@ -15,6 +15,8 @@ using ReallyStopDebugger.Native;
 
 namespace ReallyStopDebugger.Common
 {
+    using System.Collections.Generic;
+
     internal static class ProcessHelper
     {
         public static ProcessOperationException KillProcesses(
@@ -22,6 +24,7 @@ namespace ReallyStopDebugger.Common
             IList processNames,
             bool restrictUser,
             bool restrictChildren,
+            KeyValuePair<bool, List<string>> restrictPorts,
             bool consoleMode = false)
         {
             var currentProcessName = string.Empty;
@@ -49,6 +52,22 @@ namespace ReallyStopDebugger.Common
 
                 if (!filteredProcesses.Any())
                     return new ProcessOperationException(ProcessOperationResults.NotFound, new InstanceNotFoundException(Resources.ProcessNotFoundExceptionMessage));
+
+                if (restrictPorts.Key)
+                {
+                    List<Dictionary<uint, ushort>> connectedProcessesIds = WindowsNative.GetAllTCPConnections().Select(_ => new Dictionary<uint, ushort> { { _.ProcessId, _.LocalPort } }).ToList();
+
+                    filteredProcesses =
+                        filteredProcesses.Where(f =>
+                            {
+                                var processId = (uint)f.SafeGetProcessId();
+                                var p1 = connectedProcessesIds.Any(_ => _.ContainsKey(processId))
+                                        && restrictPorts.Value.Contains(connectedProcessesIds.First(_ => _.ContainsKey(processId))[processId].ToString());
+                                var p2 = !connectedProcessesIds.Any(_ => _.ContainsKey(processId));
+
+                                return p2 || p1;
+                            }).ToList();
+                }
 
                 foreach (var p in filteredProcesses)
                 {

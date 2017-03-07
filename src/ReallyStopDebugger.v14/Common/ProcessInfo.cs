@@ -45,6 +45,8 @@ namespace ReallyStopDebugger.Common
 
         public int ProcessCount { get; }
 
+        public int ProcessPort { get; set; }
+
         public bool IsSelected { get; set; }
 
         public ProcessInfo(IEnumerable<Process> processes)
